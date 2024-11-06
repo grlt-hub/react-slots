@@ -131,6 +131,8 @@ This flexibility allows you to choose whether to modify props or pass them throu
 
 Inserting multiple components into a slot is straightforward. You can call `footerSlots.insert.into.Bottom` multiple times to add different components. The components will be added in the order in which they are inserted.
 
+#### Example
+
 Here's how you can insert multiple components into the `Bottom` slot:
 
 ```tsx
@@ -153,3 +155,37 @@ The components will appear in the order they are inserted, so the rendered outpu
 ```html
 <footer>First Component Second Component</footer>
 ```
+
+### How to Manage the Order of Components in a Slot
+
+You can control the order in which components are rendered within a slot using the optional `order` property. By default, components are added in the order they are inserted. However, you can specify a custom order to rearrange them.
+
+#### Example
+
+Let's build on the previous example and introduce the order property:
+
+```tsx
+footerSlots.insert.into.Bottom({
+  component: () => <p>First Component</p>,
+});
+
+footerSlots.insert.into.Bottom({
+  component: () => <p>Second Component</p>,
+  order: 0,
+});
+```
+
+- In this case, the first call inserts `<p>First Component</p>` without an `order` property, so it gets the default position.
+- The second call inserts `<p>Second Component</p>` and specifies `order: 0`. This causes the "Second Component" to be rendered before the "First Component".
+
+With the order property applied, the rendered output will look like this:
+
+```html
+<footer>Second Component First Component</footer>
+```
+
+#### How the `order` Property Works
+
+- **Type**: `order` is always a number.
+- **Default Behavior**: If `order` is not provided, the components are rendered in the order they are inserted.
+- **Custom Order**: Components with a lower `order` value are rendered before those with a higher value. If multiple components have the same `order` value, they maintain the order of insertion.
