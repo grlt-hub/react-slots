@@ -1,0 +1,43 @@
+{
+  "name": "@grlt-hub/react-slots",
+  "version": "0.0.1",
+  "type": "module",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["/README.md", "/package.json", "/dist"],
+  "author": "Viktor Pasynok",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "@size-limit/preset-small-lib": "11.1.6",
+    "@vitest/coverage-v8": "2.1.4",
+    "clean-publish": "5.1.0",
+    "nanoid": "5.0.8",
+    "prettier": "3.3.3",
+    "prettier-plugin-organize-imports": "4.1.0",
+    "size-limit": "11.1.6",
+    "tslib": "2.8.1",
+    "tsup": "8.3.5",
+    "typescript": "5.6.3"
+  },
+  "peerDependencies": {
+    "effector": "23",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  },
+  "volta": {
+    "node": "22.9.0",
+    "npm": "10.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "homepage": "",
+  "description": "",
+  "keywords": []
+}
