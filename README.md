@@ -1,1 +1,1 @@
-# react-slots
+# React Slots
