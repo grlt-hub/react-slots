@@ -2,7 +2,7 @@
 
 Bring the power of slots to your React components effortlessly.
 
-## Table of Contents\
+## Table of Contents
 
 - [Motivation](#motivation)
 - [How does this library solve this problem?](#how-does-this-library-solve-this-problem)
