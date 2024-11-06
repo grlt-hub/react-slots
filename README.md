@@ -12,6 +12,7 @@ Bring the power of slots to your React components effortlessly.
   - [How to Pass Props to Components Inserted into a Slot](#how-to-pass-props-to-components-inserted-into-a-slot)
   - [How to Insert Multiple Components into a Slot](#how-to-insert-multiple-components-into-a-slot)
   - [How to Manage the Order of Components in a Slot](#how-to-manage-the-order-of-components-in-a-slot)
+- [Community](#community)
 
 ## Motivation
 
@@ -200,3 +201,8 @@ With the order property applied, the rendered output will look like this:
 - **Type**: `order` is always a number.
 - **Default Behavior**: If `order` is not provided, the components are rendered in the order they are inserted.
 - **Custom Order**: Components with a lower `order` value are rendered before those with a higher value. If multiple components have the same `order` value, they maintain the order of insertion.
+
+## Community
+
+- [Discord](https://discord.gg/Q4DFKnxp)
+- [Telegram](https://t.me/grlt_hub_app_compose)

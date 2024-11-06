@@ -35,9 +35,22 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/grlt-hub/react-slots.git"
   },
-  "homepage": "",
-  "description": "",
-  "keywords": []
+  "homepage": "https://github.com/grlt-hub/react-slots",
+  "description": "Bring the power of slots to your React components effortlessly.",
+  "keywords": [
+    "grlt",
+    "grlt-hub",
+    "react",
+    "slots",
+    "slot-based-architecture",
+    "dynamic-content",
+    "component-injection",
+    "modular-components",
+    "react-library",
+    "ui-framework",
+    "content-management",
+    "frontend"
+  ]
 }
