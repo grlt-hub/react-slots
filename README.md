@@ -126,3 +126,30 @@ footerSlots.insert.into.Bottom({
 - `component`: This function receives either the transformed props (if `fn` is used) or the original props and renders the component accordingly.
 
 This flexibility allows you to choose whether to modify props or pass them through unchanged, depending on your use case.
+
+### How to Insert Multiple Components into a Slot
+
+Inserting multiple components into a slot is straightforward. You can call `footerSlots.insert.into.Bottom` multiple times to add different components. The components will be added in the order in which they are inserted.
+
+Here's how you can insert multiple components into the `Bottom` slot:
+
+```tsx
+footerSlots.insert.into.Bottom({
+  component: () => <p>First Component</p>,
+});
+
+footerSlots.insert.into.Bottom({
+  component: () => <p>Second Component</p>,
+});
+```
+
+In this example:
+
+- The first call to `footerSlots.insert.into.Bottom` inserts a component that renders `<p>First Component</p>`.
+- The second call inserts a component that renders `<p>Second Component</p>`.
+
+The components will appear in the order they are inserted, so the rendered output will look like this:
+
+```html
+<footer>First Component Second Component</footer>
+```
