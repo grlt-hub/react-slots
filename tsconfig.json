@@ -18,7 +18,6 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "strictNullChecks": true,
-    "types": ["vitest/globals"],
     "verbatimModuleSyntax": true,
     "jsx": "react"
   }
