@@ -2,6 +2,17 @@
 
 Bring the power of slots to your React components effortlessly.
 
+## Table of Contents\
+
+- [Motivation](#motivation)
+- [How does this library solve this problem?](#how-does-this-library-solve-this-problem)
+- [Example](#example)
+- [Installation](#installation)
+- [How-to Guides](#how-to-guides)
+  - [How to Pass Props to Components Inserted into a Slot](#how-to-pass-props-to-components-inserted-into-a-slot)
+  - [How to Insert Multiple Components into a Slot](#how-to-insert-multiple-components-into-a-slot)
+  - [How to Manage the Order of Components in a Slot](#how-to-manage-the-order-of-components-in-a-slot)
+
 ## Motivation
 
 In modern React applications, building reusable and **flexible** components is key to scaling efficiently. However, as the complexity of components increases, the need for a slot-based architecture becomes apparent. The concept of slots, familiar to developers from frameworks like Svelte and Vue, allows for seamless content injection and greater customization of component behavior. But in React, this pattern isn’t natively supported and often leads to verbose or suboptimal solutions.
