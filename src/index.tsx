@@ -68,8 +68,9 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
     $slots.on(evt, (state, payload) => {
       const item = { ...payload, id: nanoid(10) };
       const list = insertAtPosition(state[key], payload.order ?? state[key].length + 1, item);
+      const sortedList = list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-      return { ...state, [key]: list };
+      return { ...state, [key]: sortedList };
     });
 
     // @ts-expect-error its ok. avoid extra fn creation
