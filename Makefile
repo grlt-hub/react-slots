@@ -9,3 +9,6 @@ prepublish:
 
 publish:
 	npm i && make prepublish && npx clean-publish
+
+test:
+	npx vitest

@@ -6,19 +6,24 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["/README.md", "/package.json", "/dist"],
+  "files": [
+    "/README.md",
+    "/package.json",
+    "/dist"
+  ],
   "author": "Viktor Pasynok",
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "@size-limit/preset-small-lib": "11.1.6",
+    "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "clean-publish": "5.1.0",
     "prettier": "3.3.3",
     "prettier-plugin-organize-imports": "4.1.0",
     "size-limit": "11.1.6",
     "tslib": "2.8.1",
     "tsup": "8.3.5",
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "vitest": "3.1.4"
   },
   "peerDependencies": {
     "effector": "23",
