@@ -32,5 +32,5 @@ payload({
 payload({
   fn: (data) => ({ label: data.name }),
   // @ts-expect-error expected { label: string } but got { wrong: number }
-  component: (props: { wrong: number }) => <div />,
+  component: (_: { wrong: number }) => <div />,
 });
