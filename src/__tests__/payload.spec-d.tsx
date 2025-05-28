@@ -1,27 +1,31 @@
 import React from 'react';
 import { expectTypeOf } from 'vitest';
-import { type Payload } from '../init';
+import { createSlotIdentifier, createSlots, type EmptyObject } from '../init';
 
-type EmptyObject = Record<string, never>;
+const slotId = createSlotIdentifier<{ text: string }>();
+const noPropsSlot = createSlotIdentifier<void>();
 
-declare const payload: Payload<{ name: string }>;
+const { slotsApi } = createSlots({
+  Top: slotId,
+  Bottom: noPropsSlot,
+});
 
-payload({
-  fn: (data) => ({ label: data.name }),
+slotsApi.insert.into.Top({
+  fn: (data) => ({ text: data.text }),
   component: (props) => {
-    expectTypeOf<{ label: string }>(props);
+    expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-payload({
+slotsApi.insert.into.Top({
   component: (props) => {
     expectTypeOf<EmptyObject>(props);
     return <div />;
   },
 });
 
-payload({
+slotsApi.insert.into.Top({
   fn: () => {},
   component: (props) => {
     expectTypeOf<EmptyObject>(props);
@@ -29,8 +33,15 @@ payload({
   },
 });
 
-payload({
-  fn: (data) => ({ label: data.name }),
-  // @ts-expect-error expected { label: string } but got { wrong: number }
+slotsApi.insert.into.Bottom({
+  component: (props) => {
+    expectTypeOf<EmptyObject>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  fn: (data) => ({ text: data.text }),
+  // @ts-expect-error
   component: (_: { wrong: number }) => <div />,
 });
