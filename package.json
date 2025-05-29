@@ -21,7 +21,7 @@
     "prettier-plugin-organize-imports": "4.1.0",
     "size-limit": "11.1.6",
     "tslib": "2.8.1",
-    "tsup": "8.3.5",
+    "tsdown": "^0.12.4",
     "typescript": "5.6.3",
     "vitest": "3.1.4"
   },

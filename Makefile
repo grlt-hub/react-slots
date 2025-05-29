@@ -1,5 +1,5 @@
 build:
-	rm -rf ./dist && npx tsup src/index.tsx --minify --format esm --dts
+	rm -rf ./dist && npx tsdown src/index.tsx --minify --format esm --dts
 
 lint:
 	npx size-limit
