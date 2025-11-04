@@ -217,6 +217,8 @@ slotsApi.insert.into.Sidebar({
 // </>
 ```
 
+**Note:** Components with the same `order` value keep their insertion order and all of them are rendered.
+
 ### Defer insertion until event fires
 
 Wait for data to load before inserting component. The component won't render until the event fires:
@@ -229,9 +231,9 @@ const userLoaded = createEvent<{ id: number; name: string }>();
 // Component will be inserted only after userLoaded fires
 slotsApi.insert.into.Header({
   when: userLoaded,
-  mapProps: (slotProps, eventPayload) => ({
-    userId: eventPayload.id,
-    userName: eventPayload.name,
+  mapProps: (slotProps, whenPayload) => ({
+    userId: whenPayload.id,
+    userName: whenPayload.name,
   }),
   component: (props) => <UserWidget id={props.userId} name={props.userName} />,
 });
@@ -241,6 +243,8 @@ slotsApi.insert.into.Header({
 // Later, when data arrives:
 userLoaded({ id: 123, name: 'John' }); // NOW the component is inserted and rendered
 ```
+
+**Note:** You can pass an array of events `when: [event1, event2]` to wait for multiple events (component inserts after all of them fire).
 
 ## Community
 

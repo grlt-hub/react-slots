@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](http://semver.org).
 
 - `when` parameter to defer slot insertion until specified Effector events fire
 
+```tsx
+const userLoaded = createEvent<{ id: number }>();
+
+slotsApi.insert.into.Header({
+  when: userLoaded, // Wait for event
+  mapProps: (slotProps, whenPayload) => ({ userId: whenPayload.id }),
+  component: (props) => <UserWidget id={props.userId} />,
+});
+
+userLoaded({ id: 123 }); // Component inserted now
+```
+
 ## 1.1.0
 
 ### Added
