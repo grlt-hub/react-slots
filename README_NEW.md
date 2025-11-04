@@ -241,3 +241,7 @@ slotsApi.insert.into.Header({
 // Later, when data arrives:
 userLoaded({ id: 123, name: 'John' }); // NOW the component is inserted and rendered
 ```
+
+## Community
+
+- [Telegram](https://t.me/grlt_hub_app_compose)
