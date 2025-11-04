@@ -1,13 +1,15 @@
+import { createEvent } from 'effector';
 import React from 'react';
 import { expectTypeOf } from 'vitest';
 import { EmptyObject } from '../helpers';
 import { createSlotIdentifier, createSlots } from '../index';
 
-const slotId = createSlotIdentifier<{ text: string }>();
+const slotWithProps = createSlotIdentifier<{ text: string }>();
 const noPropsSlot = createSlotIdentifier<void>();
+const signal = createEvent<number>();
 
 const { slotsApi } = createSlots({
-  Top: slotId,
+  Top: slotWithProps,
   Bottom: noPropsSlot,
 });
 
@@ -20,16 +22,39 @@ slotsApi.insert.into.Top({
 });
 
 slotsApi.insert.into.Top({
+  when: signal,
+  fn: (__, signalPayload) => ({ text: String(signalPayload) }),
   component: (props) => {
-    expectTypeOf<EmptyObject>(props);
+    expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
 slotsApi.insert.into.Top({
-  fn: () => {},
+  when: [signal],
+  fn: (__, signalPayload) => ({ text: String(signalPayload) }),
   component: (props) => {
-    expectTypeOf<EmptyObject>(props);
+    expectTypeOf<{ text: string }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  when: [signal, createEvent<string[]>()],
+  fn: (__, signalPayload) => {
+    const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
+
+    return { text };
+  },
+  component: (props) => {
+    expectTypeOf<{ text: string }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  component: (props) => {
+    expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
@@ -45,4 +70,17 @@ slotsApi.insert.into.Top({
   fn: (data) => ({ text: data.text }),
   // @ts-expect-error
   component: (_: { wrong: number }) => <div />,
+});
+
+slotsApi.insert.into.Top({
+  // @ts-expect-error
+  fn: () => {},
+  component: () => <div />,
+});
+
+slotsApi.insert.into.Top({
+  when: signal,
+  // @ts-expect-error
+  fn: (__, signalPayload) => ({ text: signalPayload }),
+  component: () => <div />,
 });
