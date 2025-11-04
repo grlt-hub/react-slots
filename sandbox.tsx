@@ -9,7 +9,6 @@ const { slotsApi } = createSlots({
 
 const appGate = createGate<number>();
 
-// todo: use `when` payload in `fn` if `when` passed
 slotsApi.insert.into.ConfirmScreenBottom({
   when: [appGate.open],
   fn: (__, y) => ({ id: Number(y) }),
