@@ -1,6 +1,7 @@
 import React from 'react';
 import { expectTypeOf } from 'vitest';
-import { createSlotIdentifier, createSlots, type EmptyObject } from '../init';
+import { EmptyObject } from '../helpers';
+import { createSlotIdentifier, createSlots } from '../init';
 
 const slotId = createSlotIdentifier<{ text: string }>();
 const noPropsSlot = createSlotIdentifier<void>();
