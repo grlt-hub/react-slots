@@ -8,6 +8,8 @@
     ".npmrc",
     "knip.json",
     "tsconfig.json",
+    "rslib.config.ts",
+    "vitest.config.ts",
     "Makefile"
   ],
   "fields": ["devDependencies", "scripts", "engines", "volta" ],

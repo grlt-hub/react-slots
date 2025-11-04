@@ -14,11 +14,13 @@
     "skipLibCheck": true,
     "removeComments": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "noEmit": false,
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
+    "emitDeclarationOnly": true,
     "jsx": "react"
-  }
+  },
+  "exclude": ["**/__tests__/**", "*.config.ts", "node_modules", "dist"]
 }

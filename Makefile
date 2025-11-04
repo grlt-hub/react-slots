@@ -1,11 +1,11 @@
 build:
-	rm -rf ./dist && npx tsdown src/index.tsx --minify --format esm --dts
+	npx rslib build
 
 lint:
 	npx size-limit
 
 prepublish:
-	make build && make lint
+	make build && make lint && make test
 
 publish:
 	npm i && make prepublish && npx clean-publish

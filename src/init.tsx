@@ -31,7 +31,7 @@ const createSlotIdentifier: CreateSlotIdentifier = () => (props) => props;
 type SlotFunction<T> = (_: T) => T;
 
 type Payload<T> = <R>(params: {
-  component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => JSX.Element;
+  component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
   fn?: (arg: T) => R;
   order?: number;
 }) => void;
