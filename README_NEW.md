@@ -214,3 +214,28 @@ slotsApi.insert.into.Sidebar({
 //   <SecondWidget /> ← order: 2
 // </>
 ```
+
+### Defer insertion until event fires
+
+Wait for data to load before inserting component. The component won't render until the event fires:
+
+```tsx
+import { createEvent } from 'effector';
+
+const userLoaded = createEvent<{ id: number; name: string }>();
+
+// Component will be inserted only after userLoaded fires
+slotsApi.insert.into.Header({
+  when: userLoaded,
+  mapProps: (slotProps, eventPayload) => ({
+    userId: eventPayload.id,
+    userName: eventPayload.name,
+  }),
+  component: (props) => <UserWidget id={props.userId} name={props.userName} />,
+});
+
+// Component is not rendered yet...
+
+// Later, when data arrives:
+userLoaded({ id: 123, name: 'John' }); // NOW the component is inserted and rendered
+```
