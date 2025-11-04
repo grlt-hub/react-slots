@@ -110,6 +110,8 @@ npm i @grlt-hub/react-slots
 pnpm add @grlt-hub/react-slots
 # or
 bun add @grlt-hub/react-slots
+# or
+yarn add @grlt-hub/react-slots
 ```
 
 TypeScript types are included out of the box.
