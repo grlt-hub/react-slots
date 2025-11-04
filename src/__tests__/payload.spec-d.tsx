@@ -14,7 +14,7 @@ const { slotsApi } = createSlots({
 });
 
 slotsApi.insert.into.Top({
-  fn: (data) => ({ text: data.text }),
+  mapProps: (data) => ({ text: data.text }),
   component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
@@ -23,7 +23,7 @@ slotsApi.insert.into.Top({
 
 slotsApi.insert.into.Top({
   when: signal,
-  fn: (__, signalPayload) => ({ text: String(signalPayload) }),
+  mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
@@ -32,7 +32,7 @@ slotsApi.insert.into.Top({
 
 slotsApi.insert.into.Top({
   when: [signal],
-  fn: (__, signalPayload) => ({ text: String(signalPayload) }),
+  mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
@@ -41,7 +41,7 @@ slotsApi.insert.into.Top({
 
 slotsApi.insert.into.Top({
   when: [signal, createEvent<string[]>()],
-  fn: (__, signalPayload) => {
+  mapProps: (__, signalPayload) => {
     const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
 
     return { text };
@@ -67,20 +67,20 @@ slotsApi.insert.into.Bottom({
 });
 
 slotsApi.insert.into.Top({
-  fn: (data) => ({ text: data.text }),
+  mapProps: (data) => ({ text: data.text }),
   // @ts-expect-error
   component: (_: { wrong: number }) => <div />,
 });
 
 slotsApi.insert.into.Top({
   // @ts-expect-error
-  fn: () => {},
+  mapProps: () => {},
   component: () => <div />,
 });
 
 slotsApi.insert.into.Top({
   when: signal,
   // @ts-expect-error
-  fn: (__, signalPayload) => ({ text: signalPayload }),
+  mapProps: (__, signalPayload) => ({ text: signalPayload }),
   component: () => <div />,
 });

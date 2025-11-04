@@ -18,7 +18,7 @@ type Entries<T> = {
 const makeChildWithProps = (child) =>
   // @ts-expect-error its ok
   memo<any>((props) => {
-    const childProps = useMemo(() => child.fn(props), [props]);
+    const childProps = useMemo(() => child.mapProps(props), [props]);
 
     return <child.component {...childProps} />;
   });

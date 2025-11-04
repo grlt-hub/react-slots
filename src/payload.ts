@@ -5,7 +5,7 @@ type ExtractWhenPayload<T> = T extends Event<infer P> ? P : T extends Event<any>
 
 type Payload<T> = <R extends T, W extends Event<any> | Event<any>[] | undefined = undefined>(params: {
   component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
-  fn?: W extends undefined ? (arg: T) => R : (arg: T, whenPayload: ExtractWhenPayload<NonNullable<W>>) => R;
+  mapProps?: W extends undefined ? (arg: T) => R : (arg: T, whenPayload: ExtractWhenPayload<NonNullable<W>>) => R;
   order?: number;
   when?: W;
 }) => void;

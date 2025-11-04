@@ -51,11 +51,11 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
 
       triggers.forEach((trigger) => {
         trigger.watch((triggerPayload) => {
-          const { when, fn, ...data } = payload;
+          const { when, mapProps, ...data } = payload;
 
-          const wrappedFn = fn ? (props: any) => fn(props, triggerPayload) : undefined;
+          const wrappedFn = mapProps ? (props: any) => mapProps(props, triggerPayload) : undefined;
 
-          insert({ ...data, fn: wrappedFn });
+          insert({ ...data, mapProps: wrappedFn });
         });
       });
 
@@ -82,7 +82,7 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
       const slotChildren = useStoreMap($slots, (x) => x[key]);
 
       return slotChildren.map((child) => {
-        if (isNil(child.fn)) {
+        if (isNil(child.mapProps)) {
           return (
             <React.Fragment key={child.id}>
               <child.component />
