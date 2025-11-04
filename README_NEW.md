@@ -112,6 +112,8 @@ pnpm add @grlt-hub/react-slots
 bun add @grlt-hub/react-slots
 ```
 
+TypeScript types are included out of the box.
+
 ### Peer dependencies
 
 - `react` ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -149,4 +151,23 @@ slotsApi.insert.into.Footer({
 //   <h1>My App</h1>
 //   <p>© 1955–1985–2015 Outatime Corp.</p>
 // </div>
+```
+
+## How-to Guides
+
+### Pass props to inserted components
+
+```tsx
+// Define slot with typed props
+const { slotsApi, Slots } = createSlots({
+  UserPanel: createSlotIdentifier<{ userId: number }>(),
+} as const);
+
+// Use in component
+<Slots.UserPanel userId={123} />;
+
+// Insert component - receives props automatically
+slotsApi.insert.into.UserPanel({
+  component: (props) => <UserWidget id={props.userId} />,
+});
 ```
