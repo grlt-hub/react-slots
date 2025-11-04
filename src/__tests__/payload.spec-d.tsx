@@ -67,20 +67,23 @@ slotsApi.insert.into.Bottom({
 });
 
 slotsApi.insert.into.Top({
-  mapProps: (data) => ({ text: data.text }),
-  // @ts-expect-error
-  component: (_: { wrong: number }) => <div />,
-});
-
-slotsApi.insert.into.Top({
-  // @ts-expect-error
   mapProps: () => {},
   component: () => <div />,
 });
 
 slotsApi.insert.into.Top({
   when: signal,
+  mapProps: (slotPayload, signalPayload) => ({ data: { signalPayload, slotPayload } }),
+  component: (props) => {
+    expectTypeOf<{
+      data: { slotPayload: { text: string }; signalPayload: number };
+    }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  mapProps: (data) => ({ text: data.text }),
   // @ts-expect-error
-  mapProps: (__, signalPayload) => ({ text: signalPayload }),
-  component: () => <div />,
+  component: (_: { wrong: number }) => <div />,
 });

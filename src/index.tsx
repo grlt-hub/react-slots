@@ -50,11 +50,14 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
       const triggers = Array.isArray(payload.when) ? payload.when : [payload.when];
 
       triggers.forEach((trigger) => {
+        // @ts-expect-error
         trigger.watch((triggerPayload) => {
           const { when, mapProps, ...data } = payload;
 
+          // @ts-expect-error
           const wrappedFn = mapProps ? (props: any) => mapProps(props, triggerPayload) : undefined;
 
+          // @ts-expect-error
           insert({ ...data, mapProps: wrappedFn });
         });
       });

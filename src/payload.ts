@@ -3,11 +3,30 @@ import type { EmptyObject } from './helpers';
 
 type ExtractWhenPayload<T> = T extends Event<infer P> ? P : T extends Event<any>[] ? EventPayload<T[number]> : never;
 
-type Payload<T> = <R extends T, W extends Event<any> | Event<any>[] | undefined = undefined>(params: {
-  component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
-  mapProps?: W extends undefined ? (arg: T) => R : (arg: T, whenPayload: ExtractWhenPayload<NonNullable<W>>) => R;
-  order?: number;
-  when?: W;
-}) => void;
+type Payload<T> = {
+  // When mapProps is provided with when
+  <R, W extends Event<any> | Event<any>[]>(params: {
+    component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
+    mapProps: (arg: T, whenPayload: ExtractWhenPayload<W>) => R;
+    order?: number;
+    when: W;
+  }): void;
+
+  // When mapProps is provided without when
+  <R>(params: {
+    component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
+    mapProps: (arg: T) => R;
+    order?: number;
+    when?: undefined;
+  }): void;
+
+  // When mapProps is not provided
+  (params: {
+    component: (props: unknown extends T ? EmptyObject : T extends void ? EmptyObject : T) => React.JSX.Element;
+    mapProps?: undefined;
+    order?: number;
+    when?: undefined;
+  }): void;
+};
 
 export type { Payload };
