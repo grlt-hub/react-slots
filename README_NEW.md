@@ -38,14 +38,12 @@ You're building an admin dashboard. Plugins should be able to add widgets to the
 
 ```tsx
 // Sidebar.tsx - core component (shouldn't change when plugins are added)
-export const Sidebar = () => {
-  return (
-    <aside>
-      <nav>Core navigation</nav>
-      {/* 🤔 How do plugins inject widgets here? */}
-    </aside>
-  );
-};
+export const Sidebar = () => (
+  <aside>
+    <nav>Core navigation</nav>
+    {/* 🤔 How do plugins inject widgets here? */}
+  </aside>
+);
 
 // plugin-analytics/index.ts - separate package
 // This plugin wants to add analytics widget to sidebar
@@ -60,7 +58,7 @@ export const Sidebar = () => {
 
 ## The solution
 
-**With `react-slots`, define extension points once and inject components from anywhere:**
+**With `@grlt-hub/react-slots`, define extension points once and inject components from anywhere:**
 
 ```tsx
 // Sidebar.tsx - define the slot
@@ -70,14 +68,12 @@ export const { slotsApi, Slots } = createSlots({
   Widgets: createSlotIdentifier(),
 } as const);
 
-export const Sidebar = () => {
-  return (
-    <aside>
-      <nav>Core navigation</nav>
-      <Slots.Widgets /> {/* Extension point */}
-    </aside>
-  );
-};
+export const Sidebar = () => (
+  <aside>
+    <nav>Core navigation</nav>
+    <Slots.Widgets /> {/* Extension point */}
+  </aside>
+);
 
 // plugin-analytics/index.ts - inject from anywhere!
 import { slotsApi } from './Sidebar';
@@ -145,12 +141,12 @@ const App = () => (
 
 // 3. Insert content into the slot
 slotsApi.insert.into.Footer({
-  component: () => <p>© 2024 My Company</p>,
+  component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
 });
 
 // Result:
 // <div>
 //   <h1>My App</h1>
-//   <p>© 2024 My Company</p>
+//   <p>© 1955–1985–2015 Outatime Corp.</p>
 // </div>
 ```
