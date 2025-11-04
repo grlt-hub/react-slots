@@ -1,208 +1,251 @@
+<p align="center">
+  <img src="logo.webp" alt="React Slots" width="200" />
+</p>
+
 # React Slots
 
-Bring the power of slots to your React components effortlessly.
+**Build extensible React components with slot-based architecture.** Define extension points where plugins and third-party code can inject content.
 
-## Table of Contents
+## What are slots?
 
-- [Motivation](#motivation)
-- [How does this library solve this problem?](#how-does-this-library-solve-this-problem)
-- [Example](#example)
-- [Installation](#installation)
-- [How-to Guides](#how-to-guides)
-  - [How to Pass Props to Components Inserted into a Slot](#how-to-pass-props-to-components-inserted-into-a-slot)
-  - [How to Insert Multiple Components into a Slot](#how-to-insert-multiple-components-into-a-slot)
-  - [How to Manage the Order of Components in a Slot](#how-to-manage-the-order-of-components-in-a-slot)
-- [Community](#community)
+**Slots** are named extension points in a component where content can be injected from outside.
 
-## Motivation
+Vue example:
 
-In modern React applications, building reusable and **flexible** components is key to scaling efficiently. However, as the complexity of components increases, the need for a slot-based architecture becomes apparent. The concept of slots, familiar to developers from frameworks like Svelte and Vue, allows for seamless content injection and greater customization of component behavior. But in React, this pattern isn’t natively supported and often leads to verbose or suboptimal solutions.
+```vue
+<!-- Sidebar.vue -->
+<aside>
+  <nav>Core navigation</nav>
+  <slot name="widgets"></slot>
+</aside>
 
-## How does this library solve this problem?
-
-`react-slots` introduces a streamlined way to implement slots, bringing familiar concepts into the React ecosystem with minimal effort. It provides developers with a clear and consistent API to define and use slots, enhancing flexibility while reducing boilerplate code. The library ensures components remain decoupled, making it easier to manage nested or complex content structures.
-
-## Example
-
-This example demonstrates how to create and use slots in React using the `@grlt-hub/react-slots` library.
-
-### Code Breakdown
-
-1. **Creating Slot Identifiers**
-
-```ts
-import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
-
-const slots = {
-  Bottom: createSlotIdentifier(),
-} as const;
+<!-- Usage -->
+<Sidebar>
+  <template #widgets>
+    <AnalyticsWidget />
+    <UserStatsWidget />
+  </template>
+</Sidebar>
 ```
 
-We import `createSlots` and `createSlotIdentifier` from the library. Then, we define a slots object, where each key represents a unique slot. In this case, we create a slot named Bottom.
+## The problem in React
 
-2. **Creating the Slot API**
+React doesn't have a built-in slot system. This creates challenges when building **extensible architectures** where different parts of your app (or plugins) need to inject content into predefined locations.
 
-```ts
-const { slotsApi: footerSlots, Slots: FooterSlots } = createSlots(slots);
-```
+### Example: Admin dashboard with plugins
 
-`createSlots` takes the `slots` object and returns two values:
-
-- `slotsApi` (renamed to `footerSlots`): an API for managing slot content.
-- `Slots` (renamed to `FooterSlots`): a component used to render the slot content in the specified location.
-
-3. **Defining the Footer Component**
+You're building an admin dashboard. Plugins should be able to add widgets to the sidebar without modifying the core `Sidebar` component:
 
 ```tsx
-const Footer = () => (
-  <footer>
-    Hello
-    <FooterSlots.Bottom />
-  </footer>
+// Sidebar.tsx - core component (shouldn't change when plugins are added)
+export const Sidebar = () => (
+  <aside>
+    <nav>Core navigation</nav>
+    {/* 🤔 How do plugins inject widgets here? */}
+  </aside>
 );
+
+// plugin-analytics/index.ts - separate package
+// This plugin wants to add analytics widget to sidebar
+// How??? 🤷‍♂️
 ```
 
-Using `footerSlots.insert.into.Bottom`, we insert content into the `Bottom` slot. Here, we add a component that renders `<code>World</code>`.
+### Standard approaches are awkward
+
+- Collecting everything in parent component - tight coupling, parent must know all plugins
+- Context with manual management - lots of boilerplate per extension point
+- Passing render functions through props - verbose, non-intuitive API
+
+## The solution
+
+**With `@grlt-hub/react-slots`, define extension points once and inject components from anywhere:**
+
+```tsx
+// Sidebar.tsx - define the slot
+import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
+
+export const { slotsApi, Slots } = createSlots({
+  Widgets: createSlotIdentifier(),
+} as const);
+
+export const Sidebar = () => (
+  <aside>
+    <nav>Core navigation</nav>
+    <Slots.Widgets /> {/* Extension point */}
+  </aside>
+);
+
+// plugin-analytics/index.ts - inject from anywhere!
+import { slotsApi } from './Sidebar';
+
+slotsApi.insert.into.Widgets({
+  component: () => <AnalyticsWidget />,
+});
+
+// plugin-user-stats/index.ts - another plugin
+import { slotsApi } from './Sidebar';
+
+slotsApi.insert.into.Widgets({
+  component: () => <UserStatsWidget />,
+});
+```
 
 ### Result
 
-After executing the code, the rendered output will be:
-
-```html
-<footer>
-  Hello
-  <code>World</code>
-</footer>
+```tsx
+<aside>
+  <nav>Core navigation</nav>
+  <AnalyticsWidget />
+  <UserStatsWidget />
+</aside>
 ```
 
-This way, the `@grlt-hub/react-slots` library provides an efficient way to define and use slots in React components, making content injection simple and flexible.
+No props drilling, no boilerplate - just define slots and inject content from anywhere in your codebase.
 
 ## Installation
 
 ```sh
 npm i @grlt-hub/react-slots
 # or
-yarn add @grlt-hub/react-slots
-# or
 pnpm add @grlt-hub/react-slots
+# or
+bun add @grlt-hub/react-slots
+# or
+yarn add @grlt-hub/react-slots
+```
+
+TypeScript types are included out of the box.
+
+### Peer dependencies
+
+- `react` ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+- `effector` 23
+- `effector-react` 23
+- `nanoid` \*
+
+## Quick Start
+
+Here's a minimal working example:
+
+```tsx
+import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
+
+// 1. Create slots
+const { slotsApi, Slots } = createSlots({
+  Footer: createSlotIdentifier(),
+} as const);
+
+// 2. Use slot in your component
+const App = () => (
+  <div>
+    <h1>My App</h1>
+    <Slots.Footer />
+  </div>
+);
+
+// 3. Insert content into the slot
+slotsApi.insert.into.Footer({
+  component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
+});
+
+// Result:
+// <div>
+//   <h1>My App</h1>
+//   <p>© 1955–1985–2015 Outatime Corp.</p>
+// </div>
 ```
 
 ## How-to Guides
 
-### How to Pass Props to Components Inserted into a Slot
-
-In this guide, we'll walk through how to define and pass props to components inserted into a slot using `@grlt-hub/react-slots`.
-
-#### Step 1: Define a Slot with Props
-
-You can specify the props a slot should accept by providing a type to `createSlotIdentifier`. For example, if you want a slot that requires a text prop, you can define it like this:
-
-```ts
-import { createSlotIdentifier } from '@grlt-hub/react-slots';
-
-const slots = {
-  Bottom: createSlotIdentifier<{ text: string }>(),
-} as const;
-```
-
-This type definition ensures that any usage of `<FooterSlots.Bottom />` must include a `text` prop.
-
-#### Step 2: Use the Slot in Your Component
-
-When you use the slot component in your layout, you must pass the required props directly:
+### Pass props to inserted components
 
 ```tsx
-const Footer = () => (
-  <footer>
-    Footer content
-    <FooterSlots.Bottom text='Hello from the slot!' />
-  </footer>
-);
+// Define slot with typed props
+const { slotsApi, Slots } = createSlots({
+  UserPanel: createSlotIdentifier<{ userId: number }>(),
+} as const);
+
+// Use in component
+<Slots.UserPanel userId={123} />;
+
+// Insert component - receives props automatically
+slotsApi.insert.into.UserPanel({
+  component: (props) => <UserWidget id={props.userId} />,
+});
 ```
 
-The `text` prop passed here will be provided to any component inserted into the `Bottom` slot.
-
-#### Step 3: Insert a Component into the Slot
-
-You use `footerSlots.insert.into.Bottom` to insert a component. The component will automatically receive the props passed to `<FooterSlots.Bottom />`:
+### Transform props with `mapProps`
 
 ```tsx
-footerSlots.insert.into.Bottom({
-  fn: ({ text }) => ({ doubleText: `${text} ${text}` }),
-  component: ({ doubleText }) => <p>{doubleText}</p>,
+const { slotsApi, Slots } = createSlots({
+  UserPanel: createSlotIdentifier<{ userId: number }>(),
+} as const);
+
+<Slots.UserPanel userId={123} />;
+
+slotsApi.insert.into.UserPanel({
+  // Transform userId into userName and isAdmin before passing to component
+  mapProps: (slotProps) => ({
+    userName: getUserName(slotProps.userId),
+    isAdmin: checkAdmin(slotProps.userId),
+  }),
+  component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
 });
 ```
 
-- `fn`: This function is optional. If provided, it receives the props from `<FooterSlots.Bottom />` (e.g.,` { text }`) and allows you to transform them before passing them to `component`. In the example above, `fn` takes `text` and creates a new prop `doubleText`, which repeats the `text` value twice.
-- **Without** `fn`: If `fn` is not provided, the props from `<FooterSlots.Bottom />` are passed directly to component without any transformation, one-to-one.
-- `component`: This function receives either the transformed props (if `fn` is used) or the original props and renders the component accordingly.
+### Control rendering order
 
-This flexibility allows you to choose whether to modify props or pass them through unchanged, depending on your use case.
-
-### How to Insert Multiple Components into a Slot
-
-Inserting multiple components into a slot is straightforward. You can call `footerSlots.insert.into.Bottom` multiple times to add different components. The components will be added in the order in which they are inserted.
-
-#### Example
-
-Here's how you can insert multiple components into the `Bottom` slot:
+Components are inserted in any order, but rendered according to `order` value (lower numbers first):
 
 ```tsx
-footerSlots.insert.into.Bottom({
-  component: () => <p>First Component</p>,
+// This is inserted first, but will render second
+slotsApi.insert.into.Sidebar({
+  component: () => <SecondWidget />,
+  order: 2,
 });
 
-footerSlots.insert.into.Bottom({
-  component: () => <p>Second Component</p>,
+// This is inserted second, but will render first
+slotsApi.insert.into.Sidebar({
+  component: () => <FirstWidget />,
+  order: 1,
 });
+
+// Result:
+// <>
+//   <FirstWidget />  ← order: 1
+//   <SecondWidget /> ← order: 2
+// </>
 ```
 
-In this example:
+**Note:** Components with the same `order` value keep their insertion order and all of them are rendered.
 
-- The first call to `footerSlots.insert.into.Bottom` inserts a component that renders `<p>First Component</p>`.
-- The second call inserts a component that renders `<p>Second Component</p>`.
+### Defer insertion until event fires
 
-The components will appear in the order they are inserted, so the rendered output will look like this:
-
-```html
-<footer>First Component Second Component</footer>
-```
-
-### How to Manage the Order of Components in a Slot
-
-You can control the order in which components are rendered within a slot using the optional `order` property. By default, components are added in the order they are inserted. However, you can specify a custom order to rearrange them.
-
-#### Example
-
-Let's build on the previous example and introduce the order property:
+Wait for data to load before inserting component. The component won't render until the event fires:
 
 ```tsx
-footerSlots.insert.into.Bottom({
-  component: () => <p>First Component</p>,
+import { createEvent } from 'effector';
+
+const userLoaded = createEvent<{ id: number; name: string }>();
+
+// Component will be inserted only after userLoaded fires
+slotsApi.insert.into.Header({
+  when: userLoaded,
+  mapProps: (slotProps, whenPayload) => ({
+    userId: whenPayload.id,
+    userName: whenPayload.name,
+  }),
+  component: (props) => <UserWidget id={props.userId} name={props.userName} />,
 });
 
-footerSlots.insert.into.Bottom({
-  component: () => <p>Second Component</p>,
-  order: 0,
-});
+// Component is not rendered yet...
+
+// Later, when data arrives:
+userLoaded({ id: 123, name: 'John' }); // NOW the component is inserted and rendered
 ```
 
-- In this case, the first call inserts `<p>First Component</p>` without an `order` property, so it gets the default position.
-- The second call inserts `<p>Second Component</p>` and specifies `order: 0`. This causes the "Second Component" to be rendered before the "First Component".
-
-With the order property applied, the rendered output will look like this:
-
-```html
-<footer>Second Component First Component</footer>
-```
-
-#### How the `order` Property Works
-
-- **Type**: `order` is always a number.
-- **Default Behavior**: If `order` is not provided, the components are rendered in the order they are inserted.
-- **Custom Order**: Components with a lower `order` value are rendered before those with a higher value. If multiple components have the same `order` value, they maintain the order of insertion.
+**Note:** You can pass an array of events `when: [event1, event2]` - component inserts when **any** of them fires. Use [once](https://patronum.effector.dev/operators/once/) from `patronum` if you need one-time insertion.
 
 ## Community
 
-- [Discord](https://discord.gg/Q4DFKnxp)
 - [Telegram](https://t.me/grlt_hub_app_compose)
