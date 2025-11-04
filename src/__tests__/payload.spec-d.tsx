@@ -1,17 +1,51 @@
+import { createEvent } from 'effector';
 import React from 'react';
 import { expectTypeOf } from 'vitest';
-import { createSlotIdentifier, createSlots, type EmptyObject } from '../init';
+import { EmptyObject } from '../helpers';
+import { createSlotIdentifier, createSlots } from '../index';
 
-const slotId = createSlotIdentifier<{ text: string }>();
+const slotWithProps = createSlotIdentifier<{ text: string }>();
 const noPropsSlot = createSlotIdentifier<void>();
+const signal = createEvent<number>();
 
 const { slotsApi } = createSlots({
-  Top: slotId,
+  Top: slotWithProps,
   Bottom: noPropsSlot,
 });
 
 slotsApi.insert.into.Top({
-  fn: (data) => ({ text: data.text }),
+  mapProps: (data) => ({ text: data.text }),
+  component: (props) => {
+    expectTypeOf<{ text: string }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  when: signal,
+  mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
+  component: (props) => {
+    expectTypeOf<{ text: string }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  when: [signal],
+  mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
+  component: (props) => {
+    expectTypeOf<{ text: string }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  when: [signal, createEvent<string[]>()],
+  mapProps: (__, signalPayload) => {
+    const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
+
+    return { text };
+  },
   component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
@@ -20,15 +54,7 @@ slotsApi.insert.into.Top({
 
 slotsApi.insert.into.Top({
   component: (props) => {
-    expectTypeOf<EmptyObject>(props);
-    return <div />;
-  },
-});
-
-slotsApi.insert.into.Top({
-  fn: () => {},
-  component: (props) => {
-    expectTypeOf<EmptyObject>(props);
+    expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
@@ -41,7 +67,23 @@ slotsApi.insert.into.Bottom({
 });
 
 slotsApi.insert.into.Top({
-  fn: (data) => ({ text: data.text }),
+  mapProps: () => {},
+  component: () => <div />,
+});
+
+slotsApi.insert.into.Top({
+  when: signal,
+  mapProps: (slotPayload, signalPayload) => ({ data: { signalPayload, slotPayload } }),
+  component: (props) => {
+    expectTypeOf<{
+      data: { slotPayload: { text: string }; signalPayload: number };
+    }>(props);
+    return <div />;
+  },
+});
+
+slotsApi.insert.into.Top({
+  mapProps: (data) => ({ text: data.text }),
   // @ts-expect-error
   component: (_: { wrong: number }) => <div />,
 });

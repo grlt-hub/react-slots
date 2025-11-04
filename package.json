@@ -1,6 +1,6 @@
 {
   "name": "@grlt-hub/react-slots",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "type": "module",
   "private": false,
   "main": "dist/index.js",
@@ -12,16 +12,16 @@
   "devDependencies": {
     "@rslib/core": "0.17.0",
     "@size-limit/preset-small-lib": "11.2.0",
+    "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "clean-publish": "6.0.1",
     "prettier": "3.6.2",
     "prettier-plugin-organize-imports": "4.3.0",
     "size-limit": "11.2.0",
     "tslib": "2.8.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.6"
+    "vitest": "4.0.7"
   },
   "peerDependencies": {
-    "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "effector": "23",
     "effector-react": "23",
     "nanoid": "*",
@@ -39,19 +39,26 @@
     "url": "https://github.com/grlt-hub/react-slots.git"
   },
   "homepage": "https://github.com/grlt-hub/react-slots",
-  "description": "Bring the power of slots to your React components effortlessly.",
+  "description": "Declarative slot system for React. Build extensible, plugin-ready components with dynamic injection powered by Effector",
   "keywords": [
     "grlt",
     "grlt-hub",
     "react",
+    "react-slots",
     "slots",
-    "slot-based-architecture",
-    "dynamic-content",
+    "slot-pattern",
+    "component-slots",
+    "plugin-architecture",
+    "extensible-components",
     "component-injection",
-    "modular-components",
-    "react-library",
-    "ui-framework",
-    "content-management",
-    "frontend"
+    "dynamic-injection",
+    "event-driven",
+    "modular-ui",
+    "type-safe",
+    "composition",
+    "composable",
+    "lightweight",
+    "deferred-rendering",
+    "lazy-components"
   ]
 }

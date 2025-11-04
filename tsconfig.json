@@ -22,5 +22,5 @@
     "emitDeclarationOnly": true,
     "jsx": "react"
   },
-  "exclude": ["**/__tests__/**", "*.config.ts", "node_modules", "dist"]
+  "exclude": ["**/__tests__/**", "*.config.ts", "node_modules", "dist", "sandbox.tsx"]
 }
