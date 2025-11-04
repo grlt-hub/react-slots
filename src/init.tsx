@@ -14,13 +14,7 @@ const insertSorted = <T extends { order?: number }>(list: T[], element: T) => {
   const elementOrder = element.order ?? 0;
   const insertIndex = list.findIndex((existing) => (existing.order ?? 0) > elementOrder);
 
-  if (insertIndex === -1) {
-    return [...list, element];
-  }
-
-  const newList = [...list];
-  newList.splice(insertIndex, 0, element);
-  return newList;
+  return list.toSpliced(insertIndex === -1 ? list.length : insertIndex, 0, element);
 };
 
 type CreateSlotIdentifier = <T>() => (_: T) => T;
