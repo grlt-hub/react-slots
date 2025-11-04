@@ -50,9 +50,12 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
       const triggers = Array.isArray(payload.when) ? payload.when : [payload.when];
 
       triggers.forEach((trigger) => {
-        trigger.watch(() => {
-          const { when, ...data } = payload;
-          insert(data);
+        trigger.watch((triggerPayload) => {
+          const { when, fn, ...data } = payload;
+
+          const wrappedFn = fn ? (props: any) => fn(props, triggerPayload) : undefined;
+
+          insert({ ...data, fn: wrappedFn });
         });
       });
 
