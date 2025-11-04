@@ -1,20 +1,15 @@
-import { createEvent, createStore } from 'effector';
+import { createEvent, createStore, type EventCallable } from 'effector';
 import { useStoreMap } from 'effector-react';
 import { nanoid } from 'nanoid';
 import React, { memo, type FunctionComponent } from 'react';
 import { insertSorted, isNil, makeChildWithProps, type EmptyObject, type Entries } from './helpers';
+import type { Payload } from './payload';
 
 type CreateSlotIdentifier = <T>() => (_: T) => T;
 
 const createSlotIdentifier: CreateSlotIdentifier = () => (props) => props;
 
 type SlotFunction<T> = (_: T) => T;
-
-type Payload<T> = <R>(params: {
-  component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => React.JSX.Element;
-  fn?: (arg: T) => R;
-  order?: number;
-}) => void;
 
 const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => {
   const entries = Object.entries(config) as Entries<typeof config>;
@@ -45,7 +40,28 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
   const insertApi = keys.reduce((acc, key) => {
     const insert = createEvent<Parameters<Payload<ExtractData<typeof key>>>[0]>();
 
-    $slots.on(insert, (state, payload) => {
+    const unwatch = insert.watch((payload) => {
+      if (isNil(payload.when)) {
+        unwatch();
+
+        return;
+      }
+
+      const triggers = Array.isArray(payload.when) ? payload.when : [payload.when];
+
+      triggers.forEach((trigger) => {
+        trigger.watch(() => {
+          const { when, ...data } = payload;
+          insert(data);
+        });
+      });
+
+      unwatch();
+    });
+
+    const immediateInsert = insert.filter({ fn: (x) => isNil(x.when) });
+
+    $slots.on(immediateInsert, (state, payload) => {
       const item = { ...payload, id: nanoid(10) };
       const list = insertSorted(state[key], item);
 
