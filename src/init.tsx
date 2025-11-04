@@ -10,17 +10,16 @@ type Entries<T> = {
 
 const isNil = <T,>(x: T | undefined | null): x is undefined | null => x === null || x === undefined;
 
-const insertAtPosition = <T,>(list: T[], position: number, element: T) => {
-  const newList = [...list];
+const insertSorted = <T extends { order?: number }>(list: T[], element: T) => {
+  const elementOrder = element.order ?? 0;
+  const insertIndex = list.findIndex((existing) => (existing.order ?? 0) > elementOrder);
 
-  if (position <= 0) {
-    newList.unshift(element);
-  } else if (position >= list.length) {
-    newList.push(element);
-  } else {
-    newList.splice(position, 0, element);
+  if (insertIndex === -1) {
+    return [...list, element];
   }
 
+  const newList = [...list];
+  newList.splice(insertIndex, 0, element);
   return newList;
 };
 
@@ -67,10 +66,9 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
 
     $slots.on(evt, (state, payload) => {
       const item = { ...payload, id: nanoid(10) };
-      const list = insertAtPosition(state[key], payload.order ?? state[key].length + 1, item);
-      const sortedList = list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const list = insertSorted(state[key], item);
 
-      return { ...state, [key]: sortedList };
+      return { ...state, [key]: list };
     });
 
     // @ts-expect-error its ok. avoid extra fn creation
@@ -94,9 +92,9 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
 
   const slots = keys.reduce((acc, key) => {
     const component = memo<ExtractData<typeof key>>((props) => {
-      const childrens = useStoreMap($slots, (x) => x[key]);
+      const children = useStoreMap($slots, (x) => x[key]);
 
-      return childrens.map((child) => {
+      return children.map((child) => {
         if (isNil(child.fn)) {
           return (
             <React.Fragment key={child.id}>
