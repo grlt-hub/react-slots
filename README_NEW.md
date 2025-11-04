@@ -171,3 +171,22 @@ slotsApi.insert.into.UserPanel({
   component: (props) => <UserWidget id={props.userId} />,
 });
 ```
+
+### Transform props with `mapProps`
+
+```tsx
+const { slotsApi, Slots } = createSlots({
+  UserPanel: createSlotIdentifier<{ userId: number }>(),
+} as const);
+
+<Slots.UserPanel userId={123} />;
+
+slotsApi.insert.into.UserPanel({
+  // Transform userId into userName and isAdmin before passing to component
+  mapProps: (slotProps) => ({
+    userName: getUserName(slotProps.userId),
+    isAdmin: checkAdmin(slotProps.userId),
+  }),
+  component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
+});
+```
