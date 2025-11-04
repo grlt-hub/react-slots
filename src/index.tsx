@@ -1,8 +1,8 @@
-import { createEvent, createStore, type EventCallable } from 'effector';
+import { createEvent, createStore } from 'effector';
 import { useStoreMap } from 'effector-react';
 import { nanoid } from 'nanoid';
 import React, { memo, type FunctionComponent } from 'react';
-import { insertSorted, isNil, makeChildWithProps, type EmptyObject, type Entries } from './helpers';
+import { insertSorted, isNil, makeChildWithProps, type Entries } from './helpers';
 import type { Payload } from './payload';
 
 type CreateSlotIdentifier = <T>() => (_: T) => T;
