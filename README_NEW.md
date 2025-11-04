@@ -190,3 +190,27 @@ slotsApi.insert.into.UserPanel({
   component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
 });
 ```
+
+### Control rendering order
+
+Components are inserted in any order, but rendered according to `order` value (lower numbers first):
+
+```tsx
+// This is inserted first, but will render second
+slotsApi.insert.into.Sidebar({
+  component: () => <SecondWidget />,
+  order: 2,
+});
+
+// This is inserted second, but will render first
+slotsApi.insert.into.Sidebar({
+  component: () => <FirstWidget />,
+  order: 1,
+});
+
+// Result:
+// <>
+//   <FirstWidget />  ← order: 1
+//   <SecondWidget /> ← order: 2
+// </>
+```
