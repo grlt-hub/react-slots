@@ -7,28 +7,44 @@ and this project adheres to [Semantic Versioning](http://semver.org).
 
 ### Changed
 
-- **BREAKING:** API structure changed to target-first approach for better DX
+- **BREAKING:** `component` field renamed to `Component` (capital C) to enable React hooks usage in inline components without ESLint warnings
 
-**Before (v2):**
+- **BREAKING:** API structure changed to target-first approach
 
-```tsx
-slotsApi.insert.into.Description({ component: MyComponent });
-```
+  **Before (v2):**
 
-**After (v3):**
+  ```tsx
+  slotsApi.insert.into.Description({ component: MyComponent });
+  ```
 
-```tsx
-slotsApi.Description.insert({ component: MyComponent });
-```
+  **After (v3):**
 
-**Benefits:**
+  ```tsx
+  slotsApi.Description.insert({ Component: MyComponent });
+  ```
 
-- **Discoverability:** Type `slotsApi.` to see all available slots, then `slotsApi.[SlotName].` to see all actions for that slot
-- **Logical grouping:** All methods for a specific slot are in one place
+  **Benefits:**
+  - **Discoverability:** Type `slotsApi.` to see all available slots, then `slotsApi.[SlotName].` to see all actions for that slot
+  - **Logical grouping:** All methods for a specific slot are in one place
 
 ### Added
 
 - `clear` method to clear all components from a slot
+
+### Migration from v2 to v3
+
+1. Replace `slotsApi.insert.into.[SlotName]` with `slotsApi.[SlotName].insert`
+2. Replace `component:` with `Component:` in all insert calls
+
+**Example:**
+
+```tsx
+// v2
+slotsApi.insert.into.Header({ component: MyComponent });
+
+// v3
+slotsApi.Header.insert({ Component: MyComponent });
+```
 
 ## 2.0.0
 

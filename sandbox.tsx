@@ -11,10 +11,10 @@ const appGate = createGate<number>();
 slotsApi.ConfirmScreenBottom.insert({
   when: [appGate.open],
   mapProps: (__, y) => ({ id: Number(y) }),
-  component: (props) => <p>Hello world! {props.id}</p>,
+  Component: (props) => <p>Hello world! {props.id}</p>,
 });
 
 slotsApi.ConfirmScreenBottom.insert({
   mapProps: (x) => x,
-  component: (props) => <p>Hello world! {props.id}</p>,
+  Component: (props) => <p>Hello world! {props.id}</p>,
 });

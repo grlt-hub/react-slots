@@ -20,7 +20,7 @@ const makeChildWithProps = (child) =>
   memo<any>((props) => {
     const childProps = useMemo(() => child.mapProps(props), [props]);
 
-    return <child.component {...childProps} />;
+    return <child.Component {...childProps} />;
   });
 
 export { insertSorted, isNil, makeChildWithProps, type EmptyObject, type Entries };

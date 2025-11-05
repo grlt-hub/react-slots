@@ -13,68 +13,68 @@ const { slotsApi } = createSlots({
   Bottom: noPropsSlot,
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   mapProps: (data) => ({ text: data.text }),
-  component: (props) => {
+  Component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   when: signal,
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
-  component: (props) => {
+  Component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   when: [signal],
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
-  component: (props) => {
+  Component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   when: [signal, createEvent<string[]>()],
   mapProps: (__, signalPayload) => {
     const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
 
     return { text };
   },
-  component: (props) => {
+  Component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Top({
-  component: (props) => {
+slotsApi.Top.insert({
+  Component: (props) => {
     expectTypeOf<{ text: string }>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Bottom({
-  component: (props) => {
+slotsApi.Bottom.insert({
+  Component: (props) => {
     expectTypeOf<EmptyObject>(props);
     return <div />;
   },
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   mapProps: () => {},
-  component: () => <div />,
+  Component: () => <div />,
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   when: signal,
   mapProps: (slotPayload, signalPayload) => ({ data: { signalPayload, slotPayload } }),
-  component: (props) => {
+  Component: (props) => {
     expectTypeOf<{
       data: { slotPayload: { text: string }; signalPayload: number };
     }>(props);
@@ -82,8 +82,8 @@ slotsApi.insert.into.Top({
   },
 });
 
-slotsApi.insert.into.Top({
+slotsApi.Top.insert({
   mapProps: (data) => ({ text: data.text }),
   // @ts-expect-error
-  component: (_: { wrong: number }) => <div />,
+  Component: (_: { wrong: number }) => <div />,
 });
