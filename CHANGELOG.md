@@ -3,6 +3,33 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](http://semver.org).
 
+## 3.0.0
+
+### Changed
+
+- **BREAKING:** API structure changed to target-first approach for better DX
+
+**Before (v2):**
+
+```tsx
+slotsApi.insert.into.Description({ component: MyComponent });
+```
+
+**After (v3):**
+
+```tsx
+slotsApi.Description.insert({ component: MyComponent });
+```
+
+**Benefits:**
+
+- **Discoverability:** Type `slotsApi.` to see all available slots, then `slotsApi.[SlotName].` to see all actions for that slot
+- **Logical grouping:** All methods for a specific slot are in one place
+
+### Added
+
+- `clear` method to clear all components from a slot
+
 ## 2.0.0
 
 ### Changed
