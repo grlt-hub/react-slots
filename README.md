@@ -77,12 +77,12 @@ const Sidebar = () => (
 
 // plugin-analytics/index.ts - inject from anywhere!
 slotsApi.Widgets.insert({
-  component: () => <AnalyticsWidget />,
+  Component: () => <AnalyticsWidget />,
 });
 
 // plugin-user-stats/index.ts - another plugin
 slotsApi.Widgets.insert({
-  component: () => <UserStatsWidget />,
+  Component: () => <UserStatsWidget />,
 });
 
 // Result:
@@ -138,7 +138,7 @@ const App = () => (
 
 // 3. Insert content into the slot
 slotsApi.Footer.insert({
-  component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
+  Component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
 });
 
 // Result:
@@ -163,7 +163,7 @@ const { slotsApi, Slots } = createSlots({
 
 // Insert component - receives props automatically
 slotsApi.UserPanel.insert({
-  component: (props) => <UserWidget id={props.userId} />,
+  Component: (props) => <UserWidget id={props.userId} />,
 });
 ```
 
@@ -182,7 +182,7 @@ slotsApi.UserPanel.insert({
     userName: getUserName(slotProps.userId),
     isAdmin: checkAdmin(slotProps.userId),
   }),
-  component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
+  Component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
 });
 ```
 
@@ -193,13 +193,13 @@ Components are inserted in any order, but rendered according to `order` value (l
 ```tsx
 // This is inserted first, but will render second
 slotsApi.Sidebar.insert({
-  component: () => <SecondWidget />,
+  Component: () => <SecondWidget />,
   order: 2,
 });
 
 // This is inserted second, but will render first
 slotsApi.Sidebar.insert({
-  component: () => <FirstWidget />,
+  Component: () => <FirstWidget />,
   order: 1,
 });
 
@@ -219,11 +219,11 @@ Remove all components from a slot:
 ```tsx
 // Insert components
 slotsApi.Sidebar.insert({
-  component: () => <Widget1 />,
+  Component: () => <Widget1 />,
 });
 
 slotsApi.Sidebar.insert({
-  component: () => <Widget2 />,
+  Component: () => <Widget2 />,
 });
 
 // Result after inserts:
@@ -257,7 +257,7 @@ slotsApi.Header.insert({
     userId: whenPayload.id,
     userName: whenPayload.name,
   }),
-  component: (props) => <UserWidget id={props.userId} name={props.userName} />,
+  Component: (props) => <UserWidget id={props.userId} name={props.userName} />,
 });
 
 // Result before userLoaded fires:

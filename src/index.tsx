@@ -112,7 +112,7 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
         if (isNil(child.mapProps)) {
           return (
             <React.Fragment key={child.id}>
-              <child.component />
+              <child.Component />
             </React.Fragment>
           );
         }
