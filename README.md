@@ -64,11 +64,11 @@ export const Sidebar = () => (
 // Sidebar.tsx - define the slot
 import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
 
-export const { slotsApi, Slots } = createSlots({
+const { slotsApi, Slots } = createSlots({
   Widgets: createSlotIdentifier(),
 } as const);
 
-export const Sidebar = () => (
+const Sidebar = () => (
   <aside>
     <nav>Core navigation</nav>
     <Slots.Widgets /> {/* Extension point */}
@@ -76,15 +76,11 @@ export const Sidebar = () => (
 );
 
 // plugin-analytics/index.ts - inject from anywhere!
-import { slotsApi } from './Sidebar';
-
 slotsApi.insert.into.Widgets({
   component: () => <AnalyticsWidget />,
 });
 
 // plugin-user-stats/index.ts - another plugin
-import { slotsApi } from './Sidebar';
-
 slotsApi.insert.into.Widgets({
   component: () => <UserStatsWidget />,
 });
