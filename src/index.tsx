@@ -1,4 +1,4 @@
-import { createEvent, createStore } from 'effector';
+import { createEvent, createStore, type EventCallable } from 'effector';
 import { useStoreMap } from 'effector-react';
 import { nanoid } from 'nanoid';
 import React, { memo, type FunctionComponent } from 'react';
@@ -17,6 +17,17 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
 
   type SetApi = {
     [key in keyof T]: T[key] extends (_: any) => unknown ? Payload<Parameters<T[key]>[0]> : never;
+  };
+
+  type ClearApi = {
+    [key in keyof T]: EventCallable<void>;
+  };
+
+  type SlotApi = {
+    [key in keyof T]: {
+      insert: SetApi[key];
+      clear: ClearApi[key];
+    };
   };
 
   type State = {
@@ -80,6 +91,19 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
     return acc;
   }, {} as SetApi);
 
+  const clearApi = keys.reduce((acc, key) => {
+    const clear = createEvent();
+
+    $slots.on(clear, (state) => {
+      if (state[key].length === 0) return state;
+      return { ...state, [key]: [] };
+    });
+
+    acc[key] = clear;
+
+    return acc;
+  }, {} as ClearApi);
+
   const slots = keys.reduce((acc, key) => {
     const component = memo<ExtractData<typeof key>>((props) => {
       const slotChildren = useStoreMap($slots, (x) => x[key]);
@@ -108,9 +132,13 @@ const createSlots = <T extends Record<string, SlotFunction<any>>>(config: T) => 
     return acc;
   }, {} as Slots);
 
-  const slotsApi = {
-    insert: { into: insertApi },
-  };
+  const slotsApi = keys.reduce((acc, key) => {
+    acc[key] = {
+      insert: insertApi[key],
+      clear: clearApi[key],
+    };
+    return acc;
+  }, {} as SlotApi);
 
   return { slotsApi, Slots: slots };
 };

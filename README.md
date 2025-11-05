@@ -76,24 +76,21 @@ const Sidebar = () => (
 );
 
 // plugin-analytics/index.ts - inject from anywhere!
-slotsApi.insert.into.Widgets({
+slotsApi.Widgets.insert({
   component: () => <AnalyticsWidget />,
 });
 
 // plugin-user-stats/index.ts - another plugin
-slotsApi.insert.into.Widgets({
+slotsApi.Widgets.insert({
   component: () => <UserStatsWidget />,
 });
-```
 
-### Result
-
-```tsx
-<aside>
-  <nav>Core navigation</nav>
-  <AnalyticsWidget />
-  <UserStatsWidget />
-</aside>
+// Result:
+// <aside>
+//   <nav>Core navigation</nav>
+//   <AnalyticsWidget />
+//   <UserStatsWidget />
+// </aside>
 ```
 
 No props drilling, no boilerplate - just define slots and inject content from anywhere in your codebase.
@@ -110,7 +107,7 @@ bun add @grlt-hub/react-slots
 yarn add @grlt-hub/react-slots
 ```
 
-TypeScript types are included out of the box.
+**Note:** TypeScript types are included out of the box.
 
 ### Peer dependencies
 
@@ -140,7 +137,7 @@ const App = () => (
 );
 
 // 3. Insert content into the slot
-slotsApi.insert.into.Footer({
+slotsApi.Footer.insert({
   component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
 });
 
@@ -165,7 +162,7 @@ const { slotsApi, Slots } = createSlots({
 <Slots.UserPanel userId={123} />;
 
 // Insert component - receives props automatically
-slotsApi.insert.into.UserPanel({
+slotsApi.UserPanel.insert({
   component: (props) => <UserWidget id={props.userId} />,
 });
 ```
@@ -179,7 +176,7 @@ const { slotsApi, Slots } = createSlots({
 
 <Slots.UserPanel userId={123} />;
 
-slotsApi.insert.into.UserPanel({
+slotsApi.UserPanel.insert({
   // Transform userId into userName and isAdmin before passing to component
   mapProps: (slotProps) => ({
     userName: getUserName(slotProps.userId),
@@ -195,13 +192,13 @@ Components are inserted in any order, but rendered according to `order` value (l
 
 ```tsx
 // This is inserted first, but will render second
-slotsApi.insert.into.Sidebar({
+slotsApi.Sidebar.insert({
   component: () => <SecondWidget />,
   order: 2,
 });
 
 // This is inserted second, but will render first
-slotsApi.insert.into.Sidebar({
+slotsApi.Sidebar.insert({
   component: () => <FirstWidget />,
   order: 1,
 });
@@ -215,6 +212,35 @@ slotsApi.insert.into.Sidebar({
 
 **Note:** Components with the same `order` value keep their insertion order and all of them are rendered.
 
+### Clear slot content
+
+Remove all components from a slot:
+
+```tsx
+// Insert components
+slotsApi.Sidebar.insert({
+  component: () => <Widget1 />,
+});
+
+slotsApi.Sidebar.insert({
+  component: () => <Widget2 />,
+});
+
+// Result after inserts:
+// <aside>
+//   <Widget1 />
+//   <Widget2 />
+// </aside>
+
+// Later, clear the slot
+slotsApi.Sidebar.clear();
+
+// Result after clear:
+// <aside>
+//   {/* Sidebar slot is now empty */}
+// </aside>
+```
+
 ### Defer insertion until event fires
 
 Wait for data to load before inserting component. The component won't render until the event fires:
@@ -225,7 +251,7 @@ import { createEvent } from 'effector';
 const userLoaded = createEvent<{ id: number; name: string }>();
 
 // Component will be inserted only after userLoaded fires
-slotsApi.insert.into.Header({
+slotsApi.Header.insert({
   when: userLoaded,
   mapProps: (slotProps, whenPayload) => ({
     userId: whenPayload.id,
@@ -234,10 +260,18 @@ slotsApi.insert.into.Header({
   component: (props) => <UserWidget id={props.userId} name={props.userName} />,
 });
 
-// Component is not rendered yet...
+// Result before userLoaded fires:
+// <header>
+//   {/* Header slot is empty, waiting... */}
+// </header>
 
 // Later, when data arrives:
-userLoaded({ id: 123, name: 'John' }); // NOW the component is inserted and rendered
+userLoaded({ id: 123, name: 'John' });
+
+// Result after userLoaded fires:
+// <header>
+//   <UserWidget id={123} name="John" />
+// </header>
 ```
 
 **Note:** You can pass an array of events `when: [event1, event2]` - component inserts when **any** of them fires. Use [once](https://patronum.effector.dev/operators/once/) from `patronum` if you need one-time insertion.
