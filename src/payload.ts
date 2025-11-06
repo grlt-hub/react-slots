@@ -8,7 +8,7 @@ type Payload<T> = {
   // When mapProps is provided with when
   <R, W extends Unit<any> | Unit<any>[]>(params: {
     Component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => ReactNode;
-    mapProps: (arg: T, whenPayload: ExtractWhenPayload<W>) => R;
+    mapProps: (slotProps: T, whenPayload: ExtractWhenPayload<W>) => R;
     order?: number;
     when: W;
   }): void;
@@ -16,7 +16,7 @@ type Payload<T> = {
   // When mapProps is provided without when
   <R>(params: {
     Component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => ReactNode;
-    mapProps: (arg: T) => R;
+    mapProps: (slotProps: T) => R;
     order?: number;
     when?: undefined;
   }): void;

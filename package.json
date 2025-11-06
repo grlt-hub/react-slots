@@ -10,10 +10,11 @@
   "author": "Viktor Pasynok",
   "license": "MIT",
   "devDependencies": {
-    "@rslib/core": "0.17.0",
+    "@rslib/core": "0.17.1",
     "@size-limit/preset-small-lib": "11.2.0",
     "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "clean-publish": "6.0.1",
+    "patronum": "2.3.0",
     "prettier": "3.6.2",
     "prettier-plugin-organize-imports": "4.3.0",
     "size-limit": "11.2.0",
