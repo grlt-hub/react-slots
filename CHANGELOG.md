@@ -1,9 +1,21 @@
-# Change Log
+# Changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](http://semver.org).
 
-## 3.0.1
+## v3.1.0
+
+### Added
+
+- Now `when` supports any `Unit` from Effector. (#11)
+
+### Changed
+
+- `Component` return type from `React.JSX.Element` to `React.ReactNode`. (#10)
+
+Big thanks to @TheCoffeeFox for spotting the type improvements!
+
+## v3.0.1
 
 ### Fixed
 

@@ -1,4 +1,5 @@
-import { createEvent } from 'effector';
+import { createEffect, createEvent, createStore } from 'effector';
+import { once } from 'patronum';
 import React from 'react';
 import { expectTypeOf } from 'vitest';
 import { EmptyObject } from '../helpers';
@@ -6,7 +7,9 @@ import { createSlotIdentifier, createSlots } from '../index';
 
 const slotWithProps = createSlotIdentifier<{ text: string }>();
 const noPropsSlot = createSlotIdentifier<void>();
-const signal = createEvent<number>();
+const triggerEvent = createEvent<number>();
+const triggerFx = createEffect((x: string[]) => [x]);
+const $trigger = createStore<boolean>(true);
 
 const { slotsApi } = createSlots({
   Top: slotWithProps,
@@ -22,7 +25,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: signal,
+  when: triggerEvent,
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   Component: (props) => {
     expectTypeOf<{ text: string }>(props);
@@ -31,7 +34,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: [signal],
+  when: [triggerEvent],
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   Component: (props) => {
     expectTypeOf<{ text: string }>(props);
@@ -40,7 +43,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: [signal, createEvent<string[]>()],
+  when: [triggerEvent, createEvent<string[]>()],
   mapProps: (__, signalPayload) => {
     const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
 
@@ -72,7 +75,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: signal,
+  when: triggerEvent,
   mapProps: (slotPayload, signalPayload) => ({ data: { signalPayload, slotPayload } }),
   Component: (props) => {
     expectTypeOf<{
@@ -80,6 +83,42 @@ slotsApi.Top.insert({
     }>(props);
     return <div />;
   },
+});
+
+slotsApi.Top.insert({
+  when: [triggerEvent, triggerFx],
+  mapProps: (__, signalPayload) => {
+    expectTypeOf<number | string[]>(signalPayload);
+    return {};
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
+  when: [triggerEvent, triggerFx, $trigger],
+  mapProps: (__, signalPayload) => {
+    expectTypeOf<number | string[] | boolean>(signalPayload);
+    return {};
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
+  when: [triggerEvent, once({ source: triggerFx.doneData }), $trigger],
+  mapProps: (__, signalPayload) => {
+    expectTypeOf<number | string[][] | boolean>(signalPayload);
+    return {};
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
+  when: [triggerEvent, once({ source: triggerFx.done }), $trigger],
+  mapProps: (__, signalPayload) => {
+    expectTypeOf<number | boolean | { params: string[]; result: string[][] }>(signalPayload);
+    return {};
+  },
+  Component: () => '',
 });
 
 slotsApi.Top.insert({

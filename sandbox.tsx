@@ -4,7 +4,7 @@ import { createSlotIdentifier, createSlots } from './src';
 
 const { slotsApi } = createSlots({
   ConfirmScreenBottom: createSlotIdentifier<{ id: number }>(),
-} as const);
+});
 
 const appGate = createGate<number>();
 
