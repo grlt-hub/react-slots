@@ -1,12 +1,13 @@
-import { createEvent } from 'effector';
+import { createEffect, createEvent, createStore, UnitValue } from 'effector';
 import React from 'react';
 import { expectTypeOf } from 'vitest';
 import { EmptyObject } from '../helpers';
 import { createSlotIdentifier, createSlots } from '../index';
+import { ExtractWhenPayload } from '../payload';
 
 const slotWithProps = createSlotIdentifier<{ text: string }>();
 const noPropsSlot = createSlotIdentifier<void>();
-const signal = createEvent<number>();
+const triggerEvent = createEvent<number>();
 
 const { slotsApi } = createSlots({
   Top: slotWithProps,
@@ -22,7 +23,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: signal,
+  when: triggerEvent,
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   Component: (props) => {
     expectTypeOf<{ text: string }>(props);
@@ -31,7 +32,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: [signal],
+  when: [triggerEvent],
   mapProps: (__, signalPayload) => ({ text: String(signalPayload) }),
   Component: (props) => {
     expectTypeOf<{ text: string }>(props);
@@ -40,7 +41,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: [signal, createEvent<string[]>()],
+  when: [triggerEvent, createEvent<string[]>()],
   mapProps: (__, signalPayload) => {
     const text = Array.isArray(signalPayload) ? signalPayload[0] : String(signalPayload);
 
@@ -72,7 +73,7 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
-  when: signal,
+  when: triggerEvent,
   mapProps: (slotPayload, signalPayload) => ({ data: { signalPayload, slotPayload } }),
   Component: (props) => {
     expectTypeOf<{
@@ -83,7 +84,36 @@ slotsApi.Top.insert({
 });
 
 slotsApi.Top.insert({
+  when: [createEvent<number>(), createStore<string>(''), createEffect((x: string[]) => x)],
+  mapProps: (__, signalPayload) => {
+    return null;
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
+  when: [createEvent<number>(), createStore<string>(''), createEffect((x: null) => x)],
+  mapProps: (__, signalPayload) => {
+    return null;
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
+  when: [createEvent<number>(), createEffect((x: string) => x)],
+  mapProps: (__, signalPayload) => {
+    return '';
+  },
+  Component: () => '',
+});
+
+slotsApi.Top.insert({
   mapProps: (data) => ({ text: data.text }),
   // @ts-expect-error
   Component: (_: { wrong: number }) => <div />,
 });
+
+
+const $a =  createEffect((x: string) => x)
+const list = [$a]
+type N = ExtractWhenPayload<typeof list>

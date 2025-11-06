@@ -1,12 +1,12 @@
-import type { Event, EventPayload } from 'effector';
+import type { Unit, UnitValue } from 'effector';
 import type { ReactNode } from 'react';
 import type { EmptyObject } from './helpers';
 
-type ExtractWhenPayload<T> = T extends Event<infer P> ? P : T extends Event<any>[] ? EventPayload<T[number]> : never;
+type ExtractWhenPayload<T> = T extends Unit<infer P> ? P : T extends Unit<any>[] ? UnitValue<T[number]> : never;
 
 type Payload<T> = {
   // When mapProps is provided with when
-  <R, W extends Event<any> | Event<any>[]>(params: {
+  <R, W extends Unit<any> | Unit<any>[]>(params: {
     Component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => ReactNode;
     mapProps: (arg: T, whenPayload: ExtractWhenPayload<W>) => R;
     order?: number;
@@ -30,4 +30,4 @@ type Payload<T> = {
   }): void;
 };
 
-export type { Payload };
+export type { ExtractWhenPayload, Payload };
