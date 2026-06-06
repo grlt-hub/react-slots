@@ -32,13 +32,13 @@ Big thanks to @TheCoffeeFox for spotting the type improvements!
   **Before (v2):**
 
   ```tsx
-  slotsApi.insert.into.Description({ component: MyComponent });
+  slotsApi.insert.into.Description({ component: MyComponent })
   ```
 
   **After (v3):**
 
   ```tsx
-  slotsApi.Description.insert({ Component: MyComponent });
+  slotsApi.Description.insert({ Component: MyComponent })
   ```
 
   **Benefits:**
@@ -58,10 +58,10 @@ Big thanks to @TheCoffeeFox for spotting the type improvements!
 
 ```tsx
 // v2
-slotsApi.insert.into.Header({ component: MyComponent });
+slotsApi.insert.into.Header({ component: MyComponent })
 
 // v3
-slotsApi.Header.insert({ Component: MyComponent });
+slotsApi.Header.insert({ Component: MyComponent })
 ```
 
 ## 2.0.0
@@ -75,15 +75,15 @@ slotsApi.Header.insert({ Component: MyComponent });
 - `when` parameter to defer slot insertion until specified Effector events fire
 
 ```tsx
-const userLoaded = createEvent<{ id: number }>();
+const userLoaded = createEvent<{ id: number }>()
 
 slotsApi.insert.into.Header({
   when: userLoaded, // Wait for event
   mapProps: (slotProps, whenPayload) => ({ userId: whenPayload.id }),
   component: (props) => <UserWidget id={props.userId} />,
-});
+})
 
-userLoaded({ id: 123 }); // Component inserted now
+userLoaded({ id: 123 }) // Component inserted now
 ```
 
 ## 1.1.0
