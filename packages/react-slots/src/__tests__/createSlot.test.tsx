@@ -342,4 +342,272 @@ describe("createSlot", () => {
 
     expect(container.innerHTML).toBe("")
   })
+
+  it("renders nothing for a child whose filter has rejected from the start, while siblings render", () => {
+    const slot = createSlot<{ pass: boolean }>()
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: () => ({}),
+      Component: () => <i>gated</i>,
+      order: 1,
+    })
+    slot.api.insert({ Component: () => <i>plain</i>, order: 2 })
+
+    const { container } = render(<slot.Root pass={false} />)
+
+    expect(texts(container, "i")).toEqual(["plain"])
+  })
+
+  it("mounts the child once filter passes, without remounting siblings", () => {
+    const slot = createSlot<{ pass: boolean }>()
+    let mounts = 0
+
+    const Tracked = () => {
+      useEffect(() => {
+        mounts += 1
+      }, [])
+
+      return <i>sibling</i>
+    }
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: () => ({}),
+      Component: () => <i>gated</i>,
+      order: 1,
+    })
+    slot.api.insert({ Component: Tracked, order: 2 })
+
+    const { container, rerender } = render(<slot.Root pass={false} />)
+
+    expect(texts(container, "i")).toEqual(["sibling"])
+
+    rerender(<slot.Root pass={true} />)
+
+    expect(texts(container, "i")).toEqual(["gated", "sibling"])
+    expect(mounts).toBe(1)
+  })
+
+  it("keeps the child mounted with the last passed props when filter turns false", () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+    let mounts = 0
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => {
+        useEffect(() => {
+          mounts += 1
+        }, [])
+
+        return <b>{props.value}</b>
+      },
+    })
+
+    const { container, rerender } = render(<slot.Root value="a" pass={true} />)
+
+    expect(texts(container, "b")).toEqual(["a"])
+
+    rerender(<slot.Root value="b" pass={false} />)
+
+    expect(texts(container, "b")).toEqual(["a"])
+    expect(mounts).toBe(1)
+  })
+
+  it("thaws the frozen child when filter passes again, updating props without remount", () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+    let mounts = 0
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => {
+        useEffect(() => {
+          mounts += 1
+        }, [])
+
+        return <b>{props.value}</b>
+      },
+    })
+
+    const { container, rerender } = render(<slot.Root value="a" pass={true} />)
+
+    rerender(<slot.Root value="b" pass={false} />)
+
+    expect(texts(container, "b")).toEqual(["a"])
+
+    rerender(<slot.Root value="b" pass={true} />)
+
+    expect(texts(container, "b")).toEqual(["b"])
+    expect(mounts).toBe(1)
+  })
+
+  it("calls filter again when raw props change", () => {
+    const slot = createSlot<{ tick: number }>()
+    let calls = 0
+
+    slot.api.insert({
+      filter: () => {
+        calls += 1
+
+        return true
+      },
+      mapProps: (slotProps) => slotProps,
+      Component: () => <i>gated</i>,
+    })
+
+    const { rerender } = render(<slot.Root tick={1} />)
+
+    const before = calls
+
+    rerender(<slot.Root tick={2} />)
+
+    expect(calls).toBe(before + 1)
+  })
+
+  it("does not call filter on a same-value host re-render", () => {
+    const slot = createSlot<{ tick: number }>()
+    let calls = 0
+
+    slot.api.insert({
+      filter: () => {
+        calls += 1
+
+        return true
+      },
+      mapProps: (slotProps) => slotProps,
+      Component: () => <i>gated</i>,
+    })
+
+    const { rerender } = render(<slot.Root tick={1} />)
+
+    const before = calls
+
+    rerender(<slot.Root tick={1} />)
+
+    expect(calls).toBe(before)
+  })
+
+  it("does not call filter of existing children when a sibling is inserted", () => {
+    const slot = createSlot<{ tick: number }>()
+    let calls = 0
+
+    slot.api.insert({
+      filter: () => {
+        calls += 1
+
+        return true
+      },
+      mapProps: (slotProps) => slotProps,
+      Component: () => <i>gated</i>,
+    })
+
+    render(<slot.Root tick={1} />)
+
+    const before = calls
+
+    act(() => {
+      slot.api.insert({ Component: () => <i>sibling</i> })
+    })
+
+    expect(calls).toBe(before)
+  })
+
+  it("does not call mapProps while filter rejects, calls it once per passed update", () => {
+    const slot = createSlot<{ tick: number; pass: boolean }>()
+    let calls = 0
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => {
+        calls += 1
+
+        return { tick: slotProps.tick }
+      },
+      Component: (props) => <b>{props.tick}</b>,
+    })
+
+    const { rerender } = render(<slot.Root tick={1} pass={false} />)
+
+    expect(calls).toBe(0)
+
+    rerender(<slot.Root tick={2} pass={false} />)
+
+    expect(calls).toBe(0)
+
+    rerender(<slot.Root tick={3} pass={true} />)
+
+    expect(calls).toBe(1)
+  })
+
+  it("freezes Component while filter rejects, even as raw props change", () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+    let renders = 0
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => {
+        renders += 1
+
+        return <b>{props.value}</b>
+      },
+    })
+
+    const { container, rerender } = render(<slot.Root value="a" pass={true} />)
+
+    const before = renders
+
+    rerender(<slot.Root value="b" pass={false} />)
+    rerender(<slot.Root value="c" pass={false} />)
+
+    expect(renders).toBe(before)
+    expect(texts(container, "b")).toEqual(["a"])
+  })
+
+  it("keeps freeze state independent across two mounted Roots of the same slot", () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => <b>{props.value}</b>,
+    })
+
+    const first = render(<slot.Root value="first" pass={true} />)
+    const second = render(<slot.Root value="second" pass={false} />)
+
+    expect(texts(first.container, "b")).toEqual(["first"])
+    expect(texts(second.container, "b")).toEqual([])
+
+    second.rerender(<slot.Root value="second" pass={true} />)
+
+    expect(texts(first.container, "b")).toEqual(["first"])
+    expect(texts(second.container, "b")).toEqual(["second"])
+  })
+
+  it("mapProps receives only props that passed filter", () => {
+    const slot = createSlot<{ kind: "str"; text: string } | { kind: "num"; value: number }>()
+    const seen: string[] = []
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.kind === "str",
+      mapProps: (slotProps) => {
+        seen.push(slotProps.kind)
+
+        return { text: slotProps.text }
+      },
+      Component: (props) => <b>{props.text}</b>,
+    })
+
+    const { container, rerender } = render(<slot.Root kind="num" value={1} />)
+
+    expect(seen).toEqual([])
+
+    rerender(<slot.Root kind="str" text="hello" />)
+
+    expect(seen).toEqual(["str"])
+    expect(texts(container, "b")).toEqual(["hello"])
+  })
 })

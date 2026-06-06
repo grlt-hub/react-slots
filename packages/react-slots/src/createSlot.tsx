@@ -1,4 +1,4 @@
-import React, { memo, type FunctionComponent, type NamedExoticComponent } from "react"
+import React, { memo, useRef, type FunctionComponent, type NamedExoticComponent, type ReactElement } from "react"
 import type { Insertable, NormalizedProps, Payload } from "./payload"
 import { createStore, useStore } from "./store"
 
@@ -15,10 +15,11 @@ const createSlot = <T extends Insertable = void>() => {
 
   const insert = ((payload: {
     Component: FunctionComponent<object>
+    filter?: (slotProps: SlotProps) => boolean
     mapProps?: (slotProps: SlotProps) => object
     order?: number | undefined
   }): void => {
-    const { Component, mapProps, order } = payload
+    const { Component, filter, mapProps, order } = payload
     const Memoized = memo(Component)
 
     const item: Item = mapProps
@@ -26,7 +27,15 @@ const createSlot = <T extends Insertable = void>() => {
           id: String(++idCounter),
           order,
           withProps: true,
-          Child: memo<SlotProps>((props) => <Memoized {...mapProps(props)} />),
+          Child: filter
+            ? memo<SlotProps>((props) => {
+                const last = useRef<ReactElement | null>(null)
+
+                if (filter(props)) last.current = <Memoized {...mapProps(props)} />
+
+                return last.current
+              })
+            : memo<SlotProps>((props) => <Memoized {...mapProps(props)} />),
         }
       : {
           id: String(++idCounter),

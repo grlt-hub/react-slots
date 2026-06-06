@@ -8,19 +8,29 @@ type NormalizedProps<T> = unknown extends T ? EmptyObject : T extends void ? Emp
 
 type InsertWithoutProps = (params: {
   Component: (props: EmptyObject) => ReactNode
+  filter?: never
   mapProps?: never
   order?: number | undefined
 }) => void
 
 type InsertWithProps<T> = {
-  <R extends Insertable>(params: {
+  <S extends NormalizedProps<T>, R extends Insertable>(params: {
+    filter: (slotProps: NormalizedProps<T>) => slotProps is S
+    mapProps: (slotProps: S) => R
     Component: (props: NormalizedProps<R>) => ReactNode
+    order?: number | undefined
+  }): void
+
+  <R extends Insertable>(params: {
+    filter?: ((slotProps: NormalizedProps<T>) => boolean) | undefined
     mapProps: (slotProps: NormalizedProps<T>) => R
+    Component: (props: NormalizedProps<R>) => ReactNode
     order?: number | undefined
   }): void
 
   (params: {
     Component: (props: EmptyObject) => ReactNode
+    filter?: never
     mapProps?: undefined
     order?: number | undefined
   }): void

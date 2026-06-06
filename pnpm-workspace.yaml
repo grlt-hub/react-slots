@@ -8,8 +8,8 @@ minimumReleaseAge: 4320
 
 minimumReleaseAgeExclude:
   - happy-dom
-  - '@rolldown/*'
-  - '@typescript/native-preview*'
+  - "@rolldown/*"
+  - "@typescript/native-preview*"
 
 onlyBuiltDependencies:
   - esbuild
