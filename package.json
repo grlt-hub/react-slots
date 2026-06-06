@@ -14,14 +14,19 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "fmt": "oxfmt --write ."
+    "fmt": "oxfmt --write .",
+    "release": "node ./scripts/release.ts",
+    "publish-ci": "node ./scripts/publish-ci.ts"
   },
   "devDependencies": {
     "@types/node": "25.9.1",
+    "@types/semver": "7.7.1",
     "@typescript/native-preview": "7.0.0-dev.20260605.1",
+    "bumpp": "11.1.0",
     "knip": "6.16.0",
     "oxfmt": "0.53.0",
     "oxlint": "1.68.0",
+    "semver": "7.8.1",
     "tsdown": "0.22.2",
     "typescript": "6.0.3",
     "vitest": "4.1.8"
