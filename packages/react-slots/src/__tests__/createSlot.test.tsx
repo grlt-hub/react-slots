@@ -587,6 +587,65 @@ describe("createSlot", () => {
     expect(texts(second.container, "b")).toEqual(["second"])
   })
 
+  it("store outlives Root unmount: remount renders the children again", () => {
+    const slot = createSlot<{ value: string }>()
+
+    slot.api.insert({ Component: () => <i>static</i>, order: 1 })
+    slot.api.insert({
+      filter: (slotProps) => slotProps.value !== "",
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => <b>{props.value}</b>,
+      order: 2,
+    })
+
+    const { container, rerender } = render(<slot.Root value="a" />)
+
+    expect(texts(container, "i")).toEqual(["static"])
+    expect(texts(container, "b")).toEqual(["a"])
+
+    rerender(<u>off</u>)
+
+    expect(texts(container, "i")).toEqual([])
+    expect(texts(container, "b")).toEqual([])
+
+    rerender(<slot.Root value="b" />)
+
+    expect(texts(container, "i")).toEqual(["static"])
+    expect(texts(container, "b")).toEqual(["b"])
+  })
+
+  it("remounted Root re-bootstraps a filtered child: frozen content does not survive remount", () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+    let mounts = 0
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => {
+        useEffect(() => {
+          mounts += 1
+        }, [])
+
+        return <b>{props.value}</b>
+      },
+    })
+
+    const { container, rerender } = render(<slot.Root value="a" pass={true} />)
+
+    expect(texts(container, "b")).toEqual(["a"])
+    expect(mounts).toBe(1)
+
+    rerender(<u>off</u>)
+    rerender(<slot.Root value="b" pass={false} />)
+
+    expect(texts(container, "b")).toEqual([])
+
+    rerender(<slot.Root value="c" pass={true} />)
+
+    expect(texts(container, "b")).toEqual(["c"])
+    expect(mounts).toBe(2)
+  })
+
   it("mapProps receives only props that passed filter", () => {
     const slot = createSlot<{ kind: "str"; text: string } | { kind: "num"; value: number }>()
     const seen: string[] = []
