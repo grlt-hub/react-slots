@@ -1,26 +1,31 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "strict": true,
-    "noImplicitAny": true,
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "lib": ["esnext"],
-    "resolveJsonModule": true,
-    "importHelpers": true,
-    "moduleResolution": "Node",
-    "module": "esnext",
-    "isolatedModules": true,
     "skipLibCheck": true,
-    "removeComments": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": false,
-    "noUncheckedIndexedAccess": true,
-    "declaration": true,
-    "strictNullChecks": true,
+
+    "target": "ES2023",
+
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+
+    "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "emitDeclarationOnly": true,
-    "jsx": "react"
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+
+    "module": "preserve",
+    "noEmit": true,
+
+    "declaration": true,
+
+    "lib": ["ES2023", "DOM"],
+
+    "jsx": "react",
+
+    "types": ["node"]
   },
-  "exclude": ["**/__tests__/**", "*.config.ts", "node_modules", "dist", "sandbox.tsx"]
+  "exclude": ["node_modules", "dist", "sandbox*.tsx"]
 }

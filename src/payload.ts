@@ -1,33 +1,31 @@
-import type { Unit, UnitValue } from 'effector';
-import type { ReactNode } from 'react';
-import type { EmptyObject } from './helpers';
+import type { ReactNode } from "react"
 
-type ExtractWhenPayload<T> = T extends Unit<infer P> ? P : T extends Unit<any>[] ? UnitValue<T[number]> : never;
+type EmptyObject = Record<string, never>
 
-type Payload<T> = {
-  // When mapProps is provided with when
-  <R, W extends Unit<any> | Unit<any>[]>(params: {
-    Component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => ReactNode;
-    mapProps: (slotProps: T, whenPayload: ExtractWhenPayload<W>) => R;
-    order?: number;
-    when: W;
-  }): void;
+type Insertable = (object & { key?: never; ref?: never }) | void
 
-  // When mapProps is provided without when
-  <R>(params: {
-    Component: (props: unknown extends R ? EmptyObject : R extends void ? EmptyObject : R) => ReactNode;
-    mapProps: (slotProps: T) => R;
-    order?: number;
-    when?: undefined;
-  }): void;
+type NormalizedProps<T> = unknown extends T ? EmptyObject : [T] extends [void] ? EmptyObject : T
 
-  // When mapProps is not provided
+type InsertWithoutProps = (params: {
+  Component: (props: EmptyObject) => ReactNode
+  mapProps?: never
+  order?: number | undefined
+}) => void
+
+type InsertWithProps<T> = {
+  <R extends Insertable>(params: {
+    Component: (props: NormalizedProps<R>) => ReactNode
+    mapProps: (slotProps: T) => R
+    order?: number | undefined
+  }): void
+
   (params: {
-    Component: (props: unknown extends T ? EmptyObject : T extends void ? EmptyObject : T) => ReactNode;
-    mapProps?: undefined;
-    order?: number;
-    when?: undefined;
-  }): void;
-};
+    Component: (props: NormalizedProps<T>) => ReactNode
+    mapProps?: undefined
+    order?: number | undefined
+  }): void
+}
 
-export type { ExtractWhenPayload, Payload };
+type Payload<T> = [NormalizedProps<T>] extends [EmptyObject] ? InsertWithoutProps : InsertWithProps<T>
+
+export type { EmptyObject, Insertable, NormalizedProps, Payload }

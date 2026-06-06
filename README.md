@@ -43,7 +43,7 @@ export const Sidebar = () => (
     <nav>Core navigation</nav>
     {/* 🤔 How do plugins inject widgets here? */}
   </aside>
-);
+)
 
 // plugin-analytics/index.ts - separate package
 // This plugin wants to add analytics widget to sidebar
@@ -62,28 +62,28 @@ export const Sidebar = () => (
 
 ```tsx
 // Sidebar.tsx - define the slot
-import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
+import { createSlots, createSlotIdentifier } from "@grlt-hub/react-slots"
 
 const { slotsApi, Slots } = createSlots({
   Widgets: createSlotIdentifier(),
-} as const);
+} as const)
 
 const Sidebar = () => (
   <aside>
     <nav>Core navigation</nav>
     <Slots.Widgets /> {/* Extension point */}
   </aside>
-);
+)
 
 // plugin-analytics/index.ts - inject from anywhere!
 slotsApi.Widgets.insert({
   Component: () => <AnalyticsWidget />,
-});
+})
 
 // plugin-user-stats/index.ts - another plugin
 slotsApi.Widgets.insert({
   Component: () => <UserStatsWidget />,
-});
+})
 
 // Result:
 // <aside>
@@ -121,12 +121,12 @@ yarn add @grlt-hub/react-slots
 Here's a minimal working example:
 
 ```tsx
-import { createSlots, createSlotIdentifier } from '@grlt-hub/react-slots';
+import { createSlots, createSlotIdentifier } from "@grlt-hub/react-slots"
 
 // 1. Create slots
 const { slotsApi, Slots } = createSlots({
   Footer: createSlotIdentifier(),
-} as const);
+} as const)
 
 // 2. Use slot in your component
 const App = () => (
@@ -134,12 +134,12 @@ const App = () => (
     <h1>My App</h1>
     <Slots.Footer />
   </div>
-);
+)
 
 // 3. Insert content into the slot
 slotsApi.Footer.insert({
   Component: () => <p>© 1955–1985–2015 Outatime Corp.</p>,
-});
+})
 
 // Result:
 // <div>
@@ -156,15 +156,15 @@ slotsApi.Footer.insert({
 // Define slot with typed props
 const { slotsApi, Slots } = createSlots({
   UserPanel: createSlotIdentifier<{ userId: number }>(),
-} as const);
+} as const)
 
 // Use in component
-<Slots.UserPanel userId={123} />;
+;<Slots.UserPanel userId={123} />
 
 // Insert component - receives props automatically
 slotsApi.UserPanel.insert({
   Component: (props) => <UserWidget id={props.userId} />,
-});
+})
 ```
 
 ### Transform props with `mapProps`
@@ -172,9 +172,9 @@ slotsApi.UserPanel.insert({
 ```tsx
 const { slotsApi, Slots } = createSlots({
   UserPanel: createSlotIdentifier<{ userId: number }>(),
-} as const);
+} as const)
 
-<Slots.UserPanel userId={123} />;
+;<Slots.UserPanel userId={123} />
 
 slotsApi.UserPanel.insert({
   // Transform userId into userName and isAdmin before passing to component
@@ -183,7 +183,7 @@ slotsApi.UserPanel.insert({
     isAdmin: checkAdmin(slotProps.userId),
   }),
   Component: (props) => <UserBadge name={props.userName} admin={props.isAdmin} />,
-});
+})
 ```
 
 ### Control rendering order
@@ -195,13 +195,13 @@ Components are inserted in any order, but rendered according to `order` value (l
 slotsApi.Sidebar.insert({
   Component: () => <SecondWidget />,
   order: 2,
-});
+})
 
 // This is inserted second, but will render first
 slotsApi.Sidebar.insert({
   Component: () => <FirstWidget />,
   order: 1,
-});
+})
 
 // Result:
 // <>
@@ -220,11 +220,11 @@ Remove all components from a slot:
 // Insert components
 slotsApi.Sidebar.insert({
   Component: () => <Widget1 />,
-});
+})
 
 slotsApi.Sidebar.insert({
   Component: () => <Widget2 />,
-});
+})
 
 // Result after inserts:
 // <aside>
@@ -233,7 +233,7 @@ slotsApi.Sidebar.insert({
 // </aside>
 
 // Later, clear the slot
-slotsApi.Sidebar.clear();
+slotsApi.Sidebar.clear()
 
 // Result after clear:
 // <aside>
@@ -246,9 +246,9 @@ slotsApi.Sidebar.clear();
 Wait for data to load before inserting component. The component won't render until the event fires:
 
 ```tsx
-import { createEvent } from 'effector';
+import { createEvent } from "effector"
 
-const userLoaded = createEvent<{ id: number; name: string }>();
+const userLoaded = createEvent<{ id: number; name: string }>()
 
 // Component will be inserted only after userLoaded fires
 slotsApi.Header.insert({
@@ -258,7 +258,7 @@ slotsApi.Header.insert({
     userName: whenPayload.name,
   }),
   Component: (props) => <UserWidget id={props.userId} name={props.userName} />,
-});
+})
 
 // Result before userLoaded fires:
 // <header>
@@ -266,7 +266,7 @@ slotsApi.Header.insert({
 // </header>
 
 // Later, when data arrives:
-userLoaded({ id: 123, name: 'John' });
+userLoaded({ id: 123, name: "John" })
 
 // Result after userLoaded fires:
 // <header>
