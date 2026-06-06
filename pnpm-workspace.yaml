@@ -13,3 +13,4 @@ minimumReleaseAgeExclude:
 
 onlyBuiltDependencies:
   - esbuild
+  - lefthook

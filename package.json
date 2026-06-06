@@ -24,6 +24,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260605.1",
     "bumpp": "11.1.0",
     "knip": "6.16.0",
+    "lefthook": "2.1.9",
     "oxfmt": "0.53.0",
     "oxlint": "1.68.0",
     "semver": "7.8.1",
