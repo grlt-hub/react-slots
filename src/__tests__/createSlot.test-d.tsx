@@ -1,7 +1,7 @@
 import React, { type ComponentProps } from "react"
 import { describe, expectTypeOf, it } from "vitest"
-import { createSlot } from "../createSlot"
 import type { EmptyObject } from "../payload"
+import { createSlot } from "../createSlot"
 
 describe("createSlot types", () => {
   it("types Slot props from T", () => {

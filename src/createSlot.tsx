@@ -1,11 +1,10 @@
 import React, { memo, type FunctionComponent, type NamedExoticComponent } from "react"
 import type { Insertable, NormalizedProps, Payload } from "./payload"
-import { createStore } from "./store"
-import { useStore } from "./useStore"
+import { createStore, useStore } from "./store"
 
 let idCounter = 0
 
-const createSlot = <T extends Insertable = void,>() => {
+const createSlot = <T extends Insertable = void>() => {
   type SlotProps = NormalizedProps<T> & object
   type Item = { id: string; order?: number | undefined; Child: NamedExoticComponent<SlotProps> }
 

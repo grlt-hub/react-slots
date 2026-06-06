@@ -1,7 +1,6 @@
 import React, { act } from "react"
 import { describe, expect, it } from "vitest"
-import { createStore, type Store } from "../store"
-import { useStore } from "../useStore"
+import { createStore, useStore, type Store } from "../store"
 import { render, texts } from "./renderer"
 
 type Item = { order?: number; label: string }

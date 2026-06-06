@@ -24,13 +24,13 @@ Package manager is pnpm (pinned via `packageManager`). pnpm settings live in `pn
 
 ## Architecture
 
-Four layers, each one file, dependencies point strictly downward:
+Three layers, each one file, dependencies point strictly downward:
 
 ```
 payload.ts      types only: Payload<T> insert signatures, NormalizedProps, EmptyObject
 createSlot.tsx  adapter: createSlot<T>() → { Root, api: { insert, clear } }
-useStore.ts     React bridge: useSyncExternalStore shim (3rd arg = SSR snapshot)
-store.ts        core: createStore — persistent sorted list + Set of listeners
+store.ts        core: createStore — persistent sorted list + Set of listeners;
+                plus useStore — useSyncExternalStore shim bridge (3rd arg = SSR snapshot)
 insertSorted.ts pure upper-bound insert into a sorted immutable list
 ```
 
@@ -51,7 +51,7 @@ These invariants exist because `useSyncExternalStore` compares snapshots with `O
 - The child `memo` wrapper is created **once at insert-time**, never inside render. (3.x created it in render — every host re-render remounted children; that bug must not return.)
 - Two distinct memo shapes depending on `mapProps`:
   - without `mapProps`: `Child = memo(Component)` directly — slot props pass through, single shallow barrier, no extra fiber;
-  - with `mapProps`: double barrier `memo(props => <Memoized {...mapProps(props)} />)` where `Memoized = memo(Component)`. Outer memo gates by raw host props (skips `mapProps` calls); inner gates by mapped **values** — so a change in a prop that `mapProps` drops never reaches `Component`, and unstable host props are shielded when `mapProps` narrows to stable values. Guarantee: `Component` re-renders ⟺ its mapped-prop values changed (library-side maximum; unstable values flowing *through* `mapProps` can only be fixed by the host).
+  - with `mapProps`: double barrier `memo(props => <Memoized {...mapProps(props)} />)` where `Memoized = memo(Component)`. Outer memo gates by raw host props (skips `mapProps` calls); inner gates by mapped **values** — so a change in a prop that `mapProps` drops never reaches `Component`, and unstable host props are shielded when `mapProps` narrows to stable values. Guarantee: `Component` re-renders ⟺ its mapped-prop values changed (library-side maximum; unstable values flowing _through_ `mapProps` can only be fixed by the host).
 - No `useMemo` inside the wrapper: `memo` already gates re-renders, so by the time the wrapper re-renders its props have changed and a cache would always miss.
 - `mapProps` is optional; without it slot props reach `Component` as-is. `mapProps` must be pure.
 - Item `id` comes from a module-level counter at insert time and is used as the React `key`: it's an _identity_ key stored in state (stable across reorders), not a position/index key.

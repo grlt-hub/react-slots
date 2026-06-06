@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "use-sync-external-store/shim"
 import { insertSorted, type WithOrder } from "./insertSorted"
 
 const EMPTY: readonly never[] = []
@@ -35,5 +36,8 @@ const createStore = <Item extends WithOrder>() => {
 
 type Store<Item extends WithOrder> = ReturnType<typeof createStore<Item>>
 
-export { createStore }
-export type { Store, WithOrder }
+const useStore = <Item extends WithOrder>(store: Store<Item>): readonly Item[] =>
+  useSyncExternalStore(store.subscribe, store.get, store.get)
+
+export { createStore, useStore }
+export type { Store }

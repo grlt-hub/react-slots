@@ -17,10 +17,5 @@
       "unknown"
     ]
   },
-  "ignorePatterns": [
-    "package-lock.json",
-    "pnpm-lock.yaml",
-    "yarn.lock",
-    "empty-sandbox.js"
-  ]
+  "ignorePatterns": ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", "empty-sandbox.js"]
 }
