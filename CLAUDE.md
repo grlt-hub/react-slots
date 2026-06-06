@@ -60,24 +60,27 @@ These invariants exist because `useSyncExternalStore` compares snapshots with `O
 ### Adapter rules (createSlot.tsx) — performance-first, by explicit owner instruction
 
 - The child `memo` wrapper is created **once at insert-time**, never inside render. (3.x created it in render — every host re-render remounted children; that bug must not return.)
+- **Props flow ONLY through explicit `mapProps`** (decided after 4.0.0-alpha.0; matches 3.x runtime). Without `mapProps` the Component receives **no props** (typed `EmptyObject`) and the host renders it without spreading — so Root props churn can never re-render it. Cheap-by-default: static children (the dominant slot payload) are physically cut off, not merely memo-shielded. Want all slot props? Write `mapProps: (p) => p` explicitly.
 - Two distinct memo shapes depending on `mapProps`:
-  - without `mapProps`: `Child = memo(Component)` directly — slot props pass through, single shallow barrier, no extra fiber;
+  - without `mapProps`: `Child = memo(Component)` rendered as `<child.Child key={id} />` — no props, no spread, never re-renders from the host (`withProps: false` discriminant in the store item);
   - with `mapProps`: double barrier `memo(props => <Memoized {...mapProps(props)} />)` where `Memoized = memo(Component)`. Outer memo gates by raw host props (skips `mapProps` calls); inner gates by mapped **values** — so a change in a prop that `mapProps` drops never reaches `Component`, and unstable host props are shielded when `mapProps` narrows to stable values. Guarantee: `Component` re-renders ⟺ its mapped-prop values changed (library-side maximum; unstable values flowing _through_ `mapProps` can only be fixed by the host).
 - No `useMemo` inside the wrapper: `memo` already gates re-renders, so by the time the wrapper re-renders its props have changed and a cache would always miss.
-- `mapProps` is optional; without it slot props reach `Component` as-is. `mapProps` must be pure.
+- `mapProps` must be pure.
+- The static branch types `Child` as `NamedExoticComponent<object>`, NOT `<EmptyObject>` — `Record<string, never>` has an index signature, so TS checks even the JSX `key` attribute against it and errors.
 - Item `id` comes from a module-level counter at insert time and is used as the React `key`: it's an _identity_ key stored in state (stable across reorders), not a position/index key.
 - Per-slot stores: inserting into one slot must never wake subscribers of another.
 
-The re-render guarantees (sibling insert doesn't re-render existing children; mid-list insert doesn't remount; same-value host re-render bails) are pinned in `createSlot.test.tsx` via render/mount counters — treat those tests as the spec.
+The re-render guarantees (sibling insert doesn't re-render existing children — both branches; mid-list insert doesn't remount; same-value host re-render bails; sibling insert doesn't even *call* `mapProps` of existing children) are pinned in `createSlot.test.tsx` via render/mount/call counters — treat those tests as the spec. Note the mapProps-skip pin needs a call counter, not a render counter: without the outer memo, `mapProps` would run on every wrapper re-render while the inner `Memoized` still bails on equal values — render counters can't see that regression.
 
 ### Type design (payload.ts)
 
-- `Payload<T>` is conditional: slots without props (`createSlot()`, `void`, `unknown` → `EmptyObject`) get a single signature with `mapProps?: never` (forbidden); slots with props get two overloads discriminated by `mapProps?: undefined`.
+- `Payload<T>` is conditional: slots without props (`createSlot()`, `void` → `EmptyObject`) get a single signature with `mapProps?: never` (forbidden); slots with props get two overloads discriminated by `mapProps?: undefined`. (`createSlot<unknown>()` doesn't exist — `unknown` fails the `Insertable` constraint; the `unknown extends T` branch in `NormalizedProps` is defensive only, unreachable through the public API.)
 - `Insertable = (object & { key?: never; ref?: never }) | void` constrains both `T` (createSlot) and `R` (mapProps result): rejects primitives (spread of a primitive crashes at runtime) and React-reserved `key`/`ref` (silently swallowed from spreads; `key` would clobber the slot's own keying). Do NOT replace with a conditional helper referencing the parameter itself — that's a circular constraint (TS2313).
 - `order?: number | undefined` (explicit `| undefined`) on every insert signature — consumers with `exactOptionalPropertyTypes` pass `order` from their own optional params.
-- `NormalizedProps` uses tuple checks (`[T] extends [void]`) — non-distributive, so union slot props like `{ x } | undefined` keep their optionality.
+- `NormalizedProps` is deliberately **distributive**: `void`/`undefined` members of a union normalize to `EmptyObject` (`{ x } | undefined` → `{ x } | EmptyObject`). JSX never passes `undefined` — the host delivers `{}` at minimum — so `EmptyObject` is the honest "no props" member; a raw `undefined` in the type would produce dead guards in `mapProps` and collapse to a required `{ x }` on the Root side via `& object`. Both sides (`Root` props and `mapProps` input) are typed from the same `NormalizedProps<T>` — never let them diverge.
 - `Component` returns `ReactNode`, **not** `JSX.Element` (CHANGELOG #10 — allows `() => null`, strings, arrays). Pinned by a runtime test.
 - The phantom type lives directly on `createSlot<T>()`; there is no identifier/config-object indirection.
+- `mapProps: cond ? fn : undefined` (union) deliberately does NOT typecheck: `mapProps` presence is a *discriminant* that statically decides `Component`'s props type. Supporting the union would require a third overload typing `Component` as `(props: NormalizedProps<R> | EmptyObject)` — defensive two-shape components, exactly what the explicit-mapProps design removed. Workaround is explicit branching (each branch types precisely); a third overload can be added later as a non-breaking minor if forwarding wrappers create real demand.
 - `@ts-expect-error` placement in test-d files is empirical: TS attributes overload failures either to a property line or to the call expression depending on how many properties fail per overload — verify with `pnpm exec tsc --noEmit` when adding cases.
 
 ## Testing

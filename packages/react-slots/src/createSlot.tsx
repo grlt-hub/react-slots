@@ -6,7 +6,10 @@ let idCounter = 0
 
 const createSlot = <T extends Insertable = void>() => {
   type SlotProps = NormalizedProps<T> & object
-  type Item = { id: string; order?: number | undefined; Child: NamedExoticComponent<SlotProps> }
+  type Item = { id: string; order?: number | undefined } & (
+    | { withProps: true; Child: NamedExoticComponent<SlotProps> }
+    | { withProps: false; Child: NamedExoticComponent<object> }
+  )
 
   const store = createStore<Item>()
 
@@ -18,14 +21,28 @@ const createSlot = <T extends Insertable = void>() => {
     const { Component, mapProps, order } = payload
     const Memoized = memo(Component)
 
-    const Child = mapProps
-      ? memo<SlotProps>((props) => <Memoized {...mapProps(props)} />)
-      : (Memoized as NamedExoticComponent<SlotProps>)
+    const item: Item = mapProps
+      ? {
+          id: String(++idCounter),
+          order,
+          withProps: true,
+          Child: memo<SlotProps>((props) => <Memoized {...mapProps(props)} />),
+        }
+      : {
+          id: String(++idCounter),
+          order,
+          withProps: false,
+          Child: Memoized,
+        }
 
-    store.insert({ id: String(++idCounter), order, Child })
+    store.insert(item)
   }) as Payload<T>
 
-  const Root = memo<SlotProps>((props) => useStore(store).map((child) => <child.Child key={child.id} {...props} />))
+  const Root = memo<SlotProps>((props) =>
+    useStore(store).map((child) =>
+      child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
+    ),
+  )
 
   return { Root, api: { insert, clear: store.clear } }
 }

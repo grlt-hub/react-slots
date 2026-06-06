@@ -45,14 +45,50 @@ describe("createSlot", () => {
     expect(texts(container, "i")).toEqual(["first", "second"])
   })
 
-  it("passes slot props to Component without mapProps", () => {
+  it("does not pass Root props to Component without mapProps", () => {
     const slot = createSlot<{ userId: number }>()
 
-    slot.api.insert({ Component: (props) => <b>{props.userId}</b> })
+    slot.api.insert({ Component: (props) => <b>{Object.keys(props).length}</b> })
+
+    const { container } = render(<slot.Root userId={123} />)
+
+    expect(texts(container, "b")).toEqual(["0"])
+  })
+
+  it("passes slot props through an explicit identity mapProps", () => {
+    const slot = createSlot<{ userId: number }>()
+
+    slot.api.insert({
+      mapProps: (slotProps) => slotProps,
+      Component: (props) => <b>{props.userId}</b>,
+    })
 
     const { container } = render(<slot.Root userId={123} />)
 
     expect(texts(container, "b")).toEqual(["123"])
+  })
+
+  it("never re-renders a child without mapProps, no matter how Root props churn", () => {
+    const slot = createSlot<{ tick: number }>()
+    let renders = 0
+
+    slot.api.insert({
+      Component: () => {
+        renders += 1
+
+        return <i>static</i>
+      },
+    })
+
+    const { rerender } = render(<slot.Root tick={1} />)
+
+    const before = renders
+
+    rerender(<slot.Root tick={2} />)
+    rerender(<slot.Root tick={3} />)
+    rerender(<slot.Root tick={4} />)
+
+    expect(renders).toBe(before)
   })
 
   it("transforms slot props with mapProps", () => {
@@ -71,7 +107,10 @@ describe("createSlot", () => {
   it("re-renders children when slot props change", () => {
     const slot = createSlot<{ value: string }>()
 
-    slot.api.insert({ Component: (props) => <b>{props.value}</b> })
+    slot.api.insert({
+      mapProps: (slotProps) => slotProps,
+      Component: (props) => <b>{props.value}</b>,
+    })
 
     const { container, rerender } = render(<slot.Root value="a" />)
 
@@ -141,11 +180,85 @@ describe("createSlot", () => {
     expect(mounts).toBe(1)
   })
 
+  it("inserting a sibling does not re-render existing mapped children", () => {
+    const slot = createSlot<{ tick: number }>()
+    let renders = 0
+
+    slot.api.insert({
+      mapProps: (slotProps) => slotProps,
+      Component: () => {
+        renders += 1
+
+        return <i>first</i>
+      },
+    })
+
+    render(<slot.Root tick={1} />)
+
+    const before = renders
+
+    act(() => {
+      slot.api.insert({ mapProps: (slotProps) => slotProps, Component: () => <i>second</i> })
+    })
+
+    expect(renders).toBe(before)
+  })
+
+  it("inserting a sibling in the middle does not remount existing mapped children", () => {
+    const slot = createSlot<{ tick: number }>()
+    let mounts = 0
+
+    const Tracked = () => {
+      useEffect(() => {
+        mounts += 1
+      }, [])
+
+      return <i>tracked</i>
+    }
+
+    slot.api.insert({ mapProps: (slotProps) => slotProps, Component: Tracked, order: 2 })
+
+    const { container } = render(<slot.Root tick={1} />)
+
+    act(() => {
+      slot.api.insert({ Component: () => <i>early</i>, order: 1 })
+    })
+
+    expect(texts(container, "i")).toEqual(["early", "tracked"])
+    expect(mounts).toBe(1)
+  })
+
+  it("does not call mapProps of existing children when a sibling is inserted", () => {
+    const slot = createSlot<{ tick: number }>()
+    let calls = 0
+
+    slot.api.insert({
+      mapProps: (slotProps) => {
+        calls += 1
+
+        return slotProps
+      },
+      Component: () => <i>mapped</i>,
+    })
+
+    const { container } = render(<slot.Root tick={1} />)
+
+    const before = calls
+
+    act(() => {
+      slot.api.insert({ Component: () => <i>sibling</i> })
+    })
+
+    expect(texts(container, "i")).toEqual(["mapped", "sibling"])
+    expect(calls).toBe(before)
+  })
+
   it("re-rendering the host with same prop values does not re-render children", () => {
     const slot = createSlot<{ value: string }>()
     let renders = 0
 
     slot.api.insert({
+      mapProps: (slotProps) => slotProps,
       Component: (props) => {
         renders += 1
 

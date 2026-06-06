@@ -19,20 +19,20 @@ describe("createSlot types", () => {
     void (<slot.Root foo="bar" />)
   })
 
-  it("Component receives slot props without mapProps", () => {
+  it("Component receives no props without mapProps, even on a typed slot", () => {
     const slot = createSlot<{ userId: number }>()
 
     slot.api.insert({
       Component: (props) => {
-        expectTypeOf(props).toEqualTypeOf<{ userId: number }>()
+        expectTypeOf(props).toEqualTypeOf<EmptyObject>()
 
-        return <b>{props.userId}</b>
+        return null
       },
     })
 
-    // @ts-expect-error — Component props do not match the slot props
+    // @ts-expect-error — slot props require an explicit mapProps
     slot.api.insert({
-      Component: (props: { nope: string }) => <b>{props.nope}</b>,
+      Component: (props: { userId: number }) => <b>{props.userId}</b>,
     })
   })
 
@@ -90,15 +90,55 @@ describe("createSlot types", () => {
     })
   })
 
-  it("keeps optionality for union slot props", () => {
+  it("rejects ref in mapProps result", () => {
+    const slot = createSlot<{ userId: number }>()
+
+    // @ts-expect-error — ref is forbidden in the mapProps result
+    slot.api.insert({
+      mapProps: () => ({ ref: "x" }),
+      Component: () => null,
+    })
+  })
+
+  it("normalizes union slot props on both sides: Root and mapProps", () => {
     const slot = createSlot<{ x: number } | undefined>()
 
+    void (<slot.Root />)
+    void (<slot.Root x={1} />)
+
+    // @ts-expect-error — unknown prop is rejected
+    void (<slot.Root y={1} />)
+
     slot.api.insert({
+      mapProps: (slotProps) => {
+        expectTypeOf(slotProps).toEqualTypeOf<{ x: number } | EmptyObject>()
+
+        return slotProps
+      },
       Component: (props) => {
-        expectTypeOf(props).toEqualTypeOf<{ x: number } | undefined>()
+        expectTypeOf(props).toEqualTypeOf<{ x: number } | EmptyObject>()
 
         return null
       },
+    })
+  })
+
+  it("accepts explicit undefined mapProps as the no-props form", () => {
+    const slot = createSlot<{ userId: number }>()
+
+    slot.api.insert({
+      mapProps: undefined,
+      Component: (props) => {
+        expectTypeOf(props).toEqualTypeOf<EmptyObject>()
+
+        return null
+      },
+    })
+
+    // @ts-expect-error — slot props require an explicit mapProps function
+    slot.api.insert({
+      mapProps: undefined,
+      Component: (props: { userId: number }) => <b>{props.userId}</b>,
     })
   })
 
