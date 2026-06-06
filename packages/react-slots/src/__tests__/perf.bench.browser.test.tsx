@@ -293,8 +293,8 @@ const mappedChurnSetup = (presence: boolean, n: number) => () => {
   return mountChurnSlot(slot.Root, "pass", n)
 }
 
-const fpsScenario = async (id: string, label: string, churn: boolean): Promise<FpsResult> => {
-  const slot = createSlot<ChurnProps>()
+const fpsScenario = async (id: string, label: string, churn: boolean, presence = false): Promise<FpsResult> => {
+  const slot = presence ? createSlot<ChurnProps>({ presence: true }) : createSlot<ChurnProps>()
 
   insertMappedFlow(slot.api.insert, false, N)
 
@@ -553,6 +553,13 @@ describe("fps report", () => {
 
   it("rAF loop without churn over the same mounted tree", async () => {
     const r = await fpsScenario("FPS-idle", "rAF idle, 1000 mapped children", false)
+
+    expect(r.frames).toBe(FRAMES)
+    expect(r.p95Ms).toBeLessThan(Math.max(2 * r.medianMs, 20))
+  })
+
+  it("rAF loop with per-frame full-flow churn over 1000 mapped children with presence", async () => {
+    const r = await fpsScenario("FPS-churn-presence", "rAF churn, 1000 mapped children, presence", true, true)
 
     expect(r.frames).toBe(FRAMES)
     expect(r.p95Ms).toBeLessThan(Math.max(2 * r.medianMs, 20))
