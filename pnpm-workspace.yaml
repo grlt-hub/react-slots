@@ -1,4 +1,13 @@
+packages:
+  - packages/*
+
 allowBuilds:
   esbuild: true
 
 minimumReleaseAge: 4320
+
+# versions already in use via the pre-workspace lockfile; safe to drop after 2026-06-07
+minimumReleaseAgeExclude:
+  - happy-dom
+  - "@rolldown/*"
+  - "@typescript/native-preview*"

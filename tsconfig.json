@@ -21,11 +21,8 @@
 
     "declaration": true,
 
-    "lib": ["ES2023", "DOM"],
-
-    "jsx": "react",
+    "lib": ["ES2023"],
 
     "types": ["node"]
-  },
-  "exclude": ["node_modules", "dist", "sandbox*.tsx"]
+  }
 }

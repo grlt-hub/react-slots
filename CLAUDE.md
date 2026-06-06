@@ -4,27 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`@grlt-hub/react-slots` v4 — a slot system for React (named extension points where plugins inject components). Effector-free rewrite (branch `4.0.0`): the only runtime dependency is `use-sync-external-store`, the only peer is `react >=16.8.0 <20.0.0`. Toolchain and code style mirror the sibling project `@grlt-hub/app-compose`.
+`@grlt-hub/react-slots` v4 — a slot system for React (named extension points where plugins inject components). Effector-free rewrite (branch `4.0.0`): the only runtime dependency is `use-sync-external-store`, the only peer is `react >=16.8.0 <20.0.0`. Toolchain, monorepo layout, and code style mirror the sibling project `@grlt-hub/app-compose`.
+
+## Monorepo layout
+
+pnpm workspace (`packages/*`), structured like app-compose:
+
+- **Root** — private `@grlt-hub/react-slots-dev`: shared toolchain in devDependencies (typescript, tsdown, vitest, knip, oxlint, oxfmt), base `tsconfig.json`, `.oxfmtrc.json`, scripts delegate via `pnpm -r`.
+- **`packages/react-slots`** — the published library: own runtime/peer deps plus package-specific devDeps (react, react-dom, happy-dom, @types/\*), own `tsconfig.json` (extends root), `tsdown.config.ts`, `vitest.config.ts`, `knip.json`, `.oxlintrc.json`, README, CHANGELOG.
 
 ## Commands
 
-```sh
-pnpm build        # tsc --noEmit + tsdown (esm + cjs + dts into dist/)
-pnpm lint         # knip (dead code/deps) + oxlint ./src
-pnpm fmt          # oxfmt --write .
-pnpm test         # vitest run (runtime tests + type tests via typecheck)
+All from the repo root:
 
-pnpm exec vitest run src/__tests__/store.test.ts     # single test file
-pnpm exec vitest run -t "insert respects order"      # single test by name
+```sh
+pnpm build        # per package: tsc --noEmit + tsdown (esm + cjs + dts into dist/)
+pnpm lint         # per package: knip (dead code/deps) + oxlint ./src
+pnpm fmt          # oxfmt --write . (root-level, formats everything)
+pnpm test         # per package: vitest run (runtime tests + type tests via typecheck)
+
+pnpm -C packages/react-slots exec vitest run src/__tests__/store.test.ts   # single test file
+pnpm -C packages/react-slots exec vitest run -t "insert respects order"    # single test by name
 ```
 
 `pnpm build && pnpm lint && pnpm test` must be green before any handoff. `prepack` runs the build automatically on publish; releases are CI-driven, never manual.
 
-Package manager is pnpm (pinned via `packageManager`). pnpm settings live in `pnpm-workspace.yaml` (`minimumReleaseAge: 4320` — new package versions younger than 3 days won't install).
+Package manager is pnpm (pinned via `packageManager`). pnpm settings live in `pnpm-workspace.yaml` (`minimumReleaseAge: 4320` — new package versions younger than 3 days won't install). Gotcha: **optional** deps blocked by that gate (platform binaries like `@rolldown/*`) are skipped *silently* and surface later as "Cannot find native binding" — fix via `minimumReleaseAgeExclude`, don't lower the gate. Current excludes are temporary (safe to drop after 2026-06-07).
+
+Knip quirks in the workspace: shared binaries/deps live at root, so the package `knip.json` needs `ignoreBinaries` and `ignoreDependencies: ["vitest"]`; config files are covered by `ignore: ["*.config.ts"]` (same as app-compose).
 
 ## Architecture
 
-Three layers, each one file, dependencies point strictly downward:
+Three layers in `packages/react-slots/src/` (paths below are relative to the package), each one file, dependencies point strictly downward:
 
 ```
 payload.ts      types only: Payload<T> insert signatures, NormalizedProps, EmptyObject

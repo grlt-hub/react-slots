@@ -1,9 +1,13 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
 
+  "ignore": ["*.config.ts"],
+
   "entry": ["./src/index.ts!"],
 
-  "ignoreDependencies": ["@typescript/native-preview"],
+  "ignoreBinaries": ["tsdown", "knip", "oxlint", "vitest", "tsc"],
+
+  "ignoreDependencies": ["vitest"],
 
   "vitest": { "config": "vitest.config.ts", "entry": "src/**/*.{test,test-d,bench}.{ts,tsx}" }
 }
