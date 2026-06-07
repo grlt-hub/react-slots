@@ -773,7 +773,7 @@ describe("presence", () => {
     expect(seen).toEqual([true])
   })
 
-  it("frozen child that always renders a wrapper element and toggles content DEEP inside it re-reports via subtree:true", async () => {
+  it("toggling content DEEP inside an always-present wrapper element keeps presence true and never phantom-re-renders the host", async () => {
     const slot = createSlot({ presence: true })
     let setDeep: (v: boolean) => void = () => {}
 
@@ -787,7 +787,9 @@ describe("presence", () => {
     })
 
     let seen: readonly boolean[] = []
+    let renders = 0
     const Host = () => {
+      renders += 1
       seen = slot.usePresence()
 
       return null
@@ -802,10 +804,13 @@ describe("presence", () => {
     await flush()
     expect(seen).toEqual([true])
 
+    const before = renders
+
     act(() => setDeep(true))
     await flush()
 
     expect(seen).toEqual([true])
+    expect(renders).toBe(before)
   })
 
   it("per-Root freeze independence under presence: two mounted Roots of the same filtered slot freeze independently", async () => {
