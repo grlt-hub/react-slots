@@ -1,6 +1,6 @@
 {
   "name": "@grlt-hub/eslint-plugin-react-slots",
-  "version": "4.0.0-beta.0",
+  "version": "4.0.0-beta.1",
   "private": false,
   "description": "Enforcing best practices for @grlt-hub/react-slots",
   "keywords": [
