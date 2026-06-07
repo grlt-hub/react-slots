@@ -80,7 +80,7 @@ const probe = (presence: PresenceStore, id: string, Component: FunctionComponent
       reportNow()
 
       const observer = new MutationObserver(reportNow)
-      observer.observe(element, { childList: true, subtree: true })
+      observer.observe(element, { childList: true })
 
       return () => {
         observer.disconnect()

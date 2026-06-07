@@ -7,4 +7,5 @@ export default defineConfig({
   minify: "dce-only",
   hash: false,
   dts: { tsgo: true },
+  banner: { js: '"use client"' },
 })

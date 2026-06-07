@@ -1,4 +1,4 @@
-import React, { memo, useRef, type FunctionComponent, type NamedExoticComponent, type ReactElement } from "react"
+import React, { memo, useState, type FunctionComponent, type NamedExoticComponent, type ReactElement } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
 import type { Insertable, NormalizedProps, Payload } from "./payload"
 import { createPresenceStore, probe, type PresenceStore } from "./presenceStore"
@@ -51,11 +51,16 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
             withProps: true,
             Child: filter
               ? memo<SlotProps>((props) => {
-                  const last = useRef<ReactElement | null>(null)
+                  const [last, setLast] = useState<{ props: SlotProps; element: ReactElement | null }>(() => ({
+                    props,
+                    element: filter(props) ? <Memoized {...mapProps(props)} /> : null,
+                  }))
 
-                  if (filter(props)) last.current = <Memoized {...mapProps(props)} />
+                  if (props !== last.props && filter(props)) {
+                    setLast({ props, element: <Memoized {...mapProps(props)} /> })
+                  }
 
-                  return last.current
+                  return last.element
                 })
               : memo<SlotProps>((props) => <Memoized {...mapProps(props)} />),
           }
@@ -104,11 +109,16 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
           withProps: true,
           Child: filter
             ? memo<SlotProps>((props) => {
-                const last = useRef<ReactElement | null>(null)
+                const [last, setLast] = useState<{ props: SlotProps; element: ReactElement | null }>(() => ({
+                  props,
+                  element: filter(props) ? <Memoized {...mapProps(props)} /> : null,
+                }))
 
-                if (filter(props)) last.current = <Memoized {...mapProps(props)} />
+                if (props !== last.props && filter(props)) {
+                  setLast({ props, element: <Memoized {...mapProps(props)} /> })
+                }
 
-                return last.current
+                return last.element
               })
             : memo<SlotProps>((props) => <Memoized {...mapProps(props)} />),
         }
@@ -172,7 +182,20 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
   }
 
   const getServerCount = () => 0
-  const getServerPresence = () => projectAllFalse(store.get())
+
+  let serverPrevItems: readonly Item[] | null = null
+  let serverPresence: readonly boolean[] = EMPTY_PRESENCE
+
+  const getServerPresence = () => {
+    const items = store.get()
+
+    if (serverPrevItems !== items) {
+      serverPrevItems = items
+      serverPresence = projectAllFalse(items)
+    }
+
+    return serverPresence
+  }
 
   const useCount = () => useSyncExternalStore(subscribe, getCount, getServerCount)
   const usePresence = () => useSyncExternalStore(subscribe, getPresence, getServerPresence)

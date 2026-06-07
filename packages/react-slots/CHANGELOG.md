@@ -3,6 +3,19 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](http://semver.org).
 
+## Unreleased
+
+### Fixed
+
+- `filter` freeze is now concurrent-safe: a render attempt React abandons (an interrupted `startTransition`, a suspended attempt) can no longer leak a never-committed element into the frozen child. The freeze cache moved from a render-written ref to render-phase state.
+- Hydrating a host that uses `usePresence` no longer triggers the React dev error "The result of getServerSnapshot should be cached" — the server snapshot is identity-cached.
+
+### Changed
+
+- The presence probe's `MutationObserver` now observes `childList` only (`subtree: true` was behaviorally inert: presence derives from the probe span's own child list).
+- Published bundles carry a `"use client"` directive (React Server Components boundary — hooks and `Root` are client-side).
+- The npm tarball now includes `LICENSE` and `CHANGELOG.md`.
+
 ## v3.1.0
 
 ### Added

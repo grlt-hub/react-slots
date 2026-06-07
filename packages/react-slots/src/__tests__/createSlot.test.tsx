@@ -1,4 +1,5 @@
-import React, { act, useEffect } from "react"
+import React, { act, startTransition, Suspense, useEffect, useState } from "react"
+import { flushSync } from "react-dom"
 import { describe, expect, it } from "vitest"
 import { createSlot } from "../createSlot"
 import { render, texts } from "./renderer"
@@ -644,6 +645,103 @@ describe("createSlot", () => {
 
     expect(texts(container, "b")).toEqual(["c"])
     expect(mounts).toBe(2)
+  })
+
+  it("a render attempt React abandons does not poison the freeze cache", async () => {
+    const slot = createSlot<{ value: string; pass: boolean }>()
+
+    slot.api.insert({
+      filter: (slotProps) => slotProps.pass,
+      mapProps: (slotProps) => ({ value: slotProps.value }),
+      Component: (props) => <b>{props.value}</b>,
+    })
+
+    const gate = new Promise<void>(() => {})
+    const MaybeSuspend = ({ on }: { on: boolean }) => {
+      if (on) throw gate
+
+      return null
+    }
+
+    let drive!: (next: { value: string; pass: boolean; suspend: boolean }) => void
+    const Host = () => {
+      const [state, set] = useState({ value: "a", pass: true, suspend: false })
+
+      drive = set
+
+      return (
+        <Suspense fallback={null}>
+          <slot.Root value={state.value} pass={state.pass} />
+          <MaybeSuspend on={state.suspend} />
+        </Suspense>
+      )
+    }
+
+    const { container } = render(<Host />)
+
+    expect(texts(container, "b")).toEqual(["a"])
+
+    await act(async () => {
+      startTransition(() => drive({ value: "b", pass: true, suspend: true }))
+    })
+
+    expect(texts(container, "b")).toEqual(["a"])
+
+    await act(async () => {
+      drive({ value: "c", pass: false, suspend: false })
+    })
+
+    expect(texts(container, "b")).toEqual(["a"])
+  })
+
+  it("frozen siblings with identical filters never tear when an urgent update interrupts a time-sliced transition", async () => {
+    const slot = createSlot<{ tick: number; kind: "pass" | "drop" }>()
+
+    const busy = () => {
+      const end = performance.now() + 0.2
+
+      while (performance.now() < end) {}
+    }
+
+    for (let i = 0; i < 100; i++) {
+      slot.api.insert({
+        filter: (slotProps) => {
+          busy()
+
+          return slotProps.kind === "pass"
+        },
+        mapProps: (slotProps) => ({ tick: slotProps.tick }),
+        Component: (props) => <b>{props.tick}</b>,
+        order: i,
+      })
+    }
+
+    let drive!: (next: { tick: number; kind: "pass" | "drop" }) => void
+    const Host = () => {
+      const [state, set] = useState<{ tick: number; kind: "pass" | "drop" }>({ tick: 1, kind: "pass" })
+
+      drive = set
+
+      return <slot.Root tick={state.tick} kind={state.kind} />
+    }
+
+    const { container } = render(<Host />)
+
+    expect(new Set(texts(container, "b"))).toEqual(new Set(["1"]))
+
+    globalThis.IS_REACT_ACT_ENVIRONMENT = false
+
+    try {
+      startTransition(() => drive({ tick: 5, kind: "pass" }))
+      await new Promise((resolve) => setTimeout(resolve, 8))
+      flushSync(() => drive({ tick: 3, kind: "drop" }))
+      await new Promise((resolve) => setTimeout(resolve, 80))
+    } finally {
+      globalThis.IS_REACT_ACT_ENVIRONMENT = true
+    }
+
+    expect(texts(container, "b")).toHaveLength(100)
+    expect(new Set(texts(container, "b")).size).toBe(1)
   })
 
   it("mapProps receives only props that passed filter", () => {
