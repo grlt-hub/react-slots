@@ -4,12 +4,15 @@
 *.log*
 .env
 .env.production
+bench-results*.json
 
 # Dist
 node_modules
 dist/
 storybook-static
 .astro/
+.vitest-attachments/
+__screenshots__/
 
 # IDE
 .vscode

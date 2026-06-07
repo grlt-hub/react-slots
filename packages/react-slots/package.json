@@ -1,6 +1,6 @@
 {
   "name": "@grlt-hub/react-slots",
-  "version": "4.0.0-alpha.0",
+  "version": "4.0.0-alpha.1",
   "private": false,
   "description": "Declarative slot system for React. Build extensible, plugin-ready components with dynamic injection",
   "keywords": [
@@ -57,7 +57,9 @@
     "build": "tsc --noEmit -p tsconfig.json && tsdown",
     "dev": "tsdown --watch",
     "prepack": "pnpm build",
-    "test": "vitest run",
+    "test": "vitest run --project unit",
+    "test:browser": "vitest run --project browser",
+    "bench:browser": "vitest run --project bench-chromium && vitest run --project bench-webkit",
     "lint": "knip && oxlint ./src"
   },
   "dependencies": {
