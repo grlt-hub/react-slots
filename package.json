@@ -1,10 +1,16 @@
 {
   "name": "@grlt-hub/react-slots-dev",
-  "version": "4.0.0-beta.0",
+  "version": "4.0.0-beta.1",
   "private": true,
   "homepage": "https://github.com/grlt-hub/react-slots",
   "license": "MIT",
   "author": "Viktor Pasynok",
+  "contributors": [
+    {
+      "name": "Viktor Pasynok",
+      "url": "https://github.com/binjospookie"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/grlt-hub/react-slots.git"

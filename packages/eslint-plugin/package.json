@@ -1,27 +1,15 @@
 {
-  "name": "@grlt-hub/react-slots",
+  "name": "@grlt-hub/eslint-plugin-react-slots",
   "version": "4.0.0-beta.1",
   "private": false,
-  "description": "Declarative slot system for React. Build extensible, plugin-ready components with dynamic injection",
+  "description": "Enforcing best practices for @grlt-hub/react-slots",
   "keywords": [
-    "component-injection",
-    "component-slots",
-    "composable",
-    "composition",
-    "deferred-rendering",
-    "dynamic-injection",
-    "extensible-components",
+    "eslint",
+    "eslint-plugin",
+    "eslintplugin",
     "grlt",
     "grlt-hub",
-    "lazy-components",
-    "lightweight",
-    "modular-ui",
-    "plugin-architecture",
-    "react",
-    "react-slots",
-    "slot-pattern",
-    "slots",
-    "type-safe"
+    "react-slots"
   ],
   "homepage": "https://github.com/grlt-hub/react-slots",
   "license": "MIT",
@@ -37,18 +25,17 @@
     "url": "git+https://github.com/grlt-hub/react-slots.git"
   },
   "files": [
-    "dist",
-    "CHANGELOG.md"
+    "dist"
   ],
   "type": "module",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
         "types": "./dist/index.d.cts",
@@ -64,24 +51,20 @@
     "build": "tsc --noEmit -p tsconfig.json && tsdown",
     "dev": "tsdown --watch",
     "prepack": "pnpm build",
-    "test": "vitest run --project unit",
-    "test:browser": "vitest run --project browser",
-    "bench:browser": "vitest run --project bench-chromium && vitest run --project bench-webkit",
+    "test": "vitest run",
     "lint": "knip && oxlint ./src"
   },
   "dependencies": {
-    "use-sync-external-store": "^1.0.0"
+    "@typescript-eslint/utils": "^8.60.0"
   },
   "devDependencies": {
-    "@types/react": "19.2.16",
-    "@types/react-dom": "19.2.3",
-    "@types/use-sync-external-store": "1.5.0",
-    "happy-dom": "20.10.1",
-    "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "@grlt-hub/react-slots": "workspace:*",
+    "@typescript-eslint/rule-tester": "8.60.1",
+    "eslint": "10.4.1"
   },
   "peerDependencies": {
-    "react": ">=16.8.0 <20.0.0"
+    "eslint": "^9.0.0 || ^10.0.0",
+    "typescript": "^5.0.0 || ^6.0.0"
   },
   "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
 }
