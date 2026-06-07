@@ -1,6 +1,6 @@
 {
   "name": "@grlt-hub/react-slots",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.3",
   "private": false,
   "description": "Declarative slot system for React. Build extensible, plugin-ready components with dynamic injection",
   "keywords": [
