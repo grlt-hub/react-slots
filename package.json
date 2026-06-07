@@ -5,6 +5,12 @@
   "homepage": "https://github.com/grlt-hub/react-slots",
   "license": "MIT",
   "author": "Viktor Pasynok",
+  "contributors": [
+    {
+      "name": "Viktor Pasynok",
+      "url": "https://github.com/binjospookie"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/grlt-hub/react-slots.git"
