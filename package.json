@@ -1,6 +1,6 @@
 {
   "name": "@grlt-hub/react-slots-dev",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.3",
   "private": true,
   "homepage": "https://github.com/grlt-hub/react-slots",
   "license": "MIT",
@@ -28,13 +28,13 @@
     "@vitest/browser": "4.1.8",
     "@vitest/browser-playwright": "4.1.8",
     "bumpp": "11.1.0",
-    "knip": "6.16.0",
+    "knip": "6.15.0",
     "lefthook": "2.1.9",
     "oxfmt": "0.53.0",
     "oxlint": "1.68.0",
     "playwright": "1.60.0",
     "semver": "7.8.1",
-    "tsdown": "0.22.2",
+    "tsdown": "0.22.1",
     "typescript": "6.0.3",
     "vitest": "4.1.8"
   },
