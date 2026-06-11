@@ -3,6 +3,7 @@ packages:
 
 allowBuilds:
   esbuild: true
+  lefthook: true
 
 minimumReleaseAge: 4320
 
@@ -10,7 +11,4 @@ minimumReleaseAgeExclude:
   - happy-dom
   - "@rolldown/*"
   - "@typescript/native-preview*"
-
-onlyBuiltDependencies:
-  - esbuild
-  - lefthook
+provenance: true
