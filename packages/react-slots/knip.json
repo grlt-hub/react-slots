@@ -9,5 +9,5 @@
 
   "ignoreDependencies": ["vitest"],
 
-  "vitest": { "config": "vitest.config.ts", "entry": "src/**/*.{test,test-d,bench}.{ts,tsx}" }
+  "vitest": { "config": "vitest.config.ts", "entry": "src/**/*.{test,test-d}.{ts,tsx}" }
 }

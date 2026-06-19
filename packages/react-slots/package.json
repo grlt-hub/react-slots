@@ -65,8 +65,6 @@
     "dev": "tsdown --watch",
     "prepack": "pnpm build",
     "test": "vitest run --project unit",
-    "test:browser": "vitest run --project browser",
-    "bench:browser": "vitest run --project bench-chromium && vitest run --project bench-webkit",
     "lint": "knip && oxlint ./src"
   },
   "dependencies": {
