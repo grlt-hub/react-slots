@@ -45,11 +45,5 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Install browsers
-        run: pnpm test:browser:install
-
-      - name: Run browser tests
-        run: pnpm test:browser
-
       - name: Publish
         run: npm i -g npm@^11.5.2 && pnpm run publish-ci "${GITHUB_REF_NAME}"

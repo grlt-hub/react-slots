@@ -9,7 +9,7 @@ try {
   })
 
   console.log(
-    `New release ${result.newVersion} is ready, waiting for confirmation at https://github.com/grlt-hub/app-compose/actions`,
+    `New release ${result.newVersion} is ready, waiting for confirmation at https://github.com/grlt-hub/react-slots/actions`,
   )
 } catch (err) {
   console.error(err)
