@@ -14,4 +14,7 @@ export default defineConfig({
   },
 
   dts: { tsgo: true },
+
+  publint: true,
+  attw: { level: "error" },
 })

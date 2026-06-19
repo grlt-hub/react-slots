@@ -8,4 +8,6 @@ export default defineConfig({
   hash: false,
   dts: { tsgo: true },
   banner: { js: '"use client"' },
+  publint: true,
+  attw: { level: "error" },
 })
