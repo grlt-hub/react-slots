@@ -56,7 +56,7 @@
     "lint": "knip && oxlint ./src"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^8.58.0"
+    "@typescript-eslint/utils": "^8.61.1"
   },
   "devDependencies": {
     "@grlt-hub/react-slots": "workspace:*",

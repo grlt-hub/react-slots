@@ -69,7 +69,7 @@
     "lint": "knip && oxlint ./src"
   },
   "dependencies": {
-    "use-sync-external-store": "^1.0.0"
+    "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {
     "@types/react": "19.2.16",
