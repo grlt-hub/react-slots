@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="316 66 568 468" width="568" height="468" preserveAspectRatio="xMidYMid meet" font-family="'JetBrains Mono', ui-monospace, monospace">
+  <defs>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <style>
+      /* JS-free animation: pure CSS @keyframes. Runs standalone, inside &lt;img&gt;, and inline. */
+      .mod { opacity: 1; animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(.22,.7,.2,1); }
+      .glow { opacity: 0; animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: ease-out; }
+
+      .h1 { transform: translate(716px,116px); animation-name: fly-h1; }
+      .h2 { transform: translate(808px,116px); animation-name: fly-h2; }
+      .s1 { transform: translate(434px,219px); animation-name: fly-s1; }
+      .s2 { transform: translate(434px,309px); animation-name: fly-s2; }
+      .s3 { transform: translate(434px,399px); animation-name: fly-s3; }
+      .f1 { transform: translate(675px,476px); animation-name: fly-f1; }
+      .f2 { transform: translate(795px,476px); animation-name: fly-f2; }
+
+      .g-h1 { animation-name: gl-h1; } .g-h2 { animation-name: gl-h2; }
+      .g-s1 { animation-name: gl-s1; } .g-s2 { animation-name: gl-s2; } .g-s3 { animation-name: gl-s3; }
+      .g-f1 { animation-name: gl-f1; } .g-f2 { animation-name: gl-f2; }
+
+      @keyframes fly-h1 { 0%,6%  { opacity:0; transform:translate(718px,-244px); } 16%,82% { opacity:1; transform:translate(716px,116px); } 92%,100% { opacity:0; transform:translate(716px,116px); } }
+      @keyframes fly-h2 { 0%,9%  { opacity:0; transform:translate(1330px,86px); }  19%,82% { opacity:1; transform:translate(808px,116px); } 92%,100% { opacity:0; transform:translate(808px,116px); } }
+      /* s2 (order 20): docks at the top, then reflows down to the middle when 10 inserts above. */
+      @keyframes fly-s2 { 0%,16% { opacity:0; transform:translate(14px,39px); } 26%,50% { opacity:1; transform:translate(434px,219px); } 60%,82% { opacity:1; transform:translate(434px,309px); } 92%,100% { opacity:0; transform:translate(434px,309px); } }
+      /* s3 (order 30): docks in the middle, then reflows to the bottom on the same insert. */
+      @keyframes fly-s3 { 0%,20% { opacity:0; transform:translate(-26px,579px); } 30%,50% { opacity:1; transform:translate(434px,309px); } 60%,82% { opacity:1; transform:translate(434px,399px); } 92%,100% { opacity:0; transform:translate(434px,399px); } }
+      /* s1 (order 10): inserts late from the left, jumps to the top and pushes 20 and 30 down. */
+      @keyframes fly-s1 { 0%,52% { opacity:0; transform:translate(160px,219px); } 64%,82% { opacity:1; transform:translate(434px,219px); } 92%,100% { opacity:0; transform:translate(434px,219px); } }
+      @keyframes fly-f1 { 0%,28% { opacity:0; transform:translate(675px,836px); }  38%,82% { opacity:1; transform:translate(675px,476px); } 92%,100% { opacity:0; transform:translate(675px,476px); } }
+      @keyframes fly-f2 { 0%,31% { opacity:0; transform:translate(1215px,836px); } 41%,82% { opacity:1; transform:translate(795px,476px); } 92%,100% { opacity:0; transform:translate(795px,476px); } }
+
+      @keyframes gl-h1 { 0%,12% { opacity:0; } 16% { opacity:.85; } 24% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-h2 { 0%,15% { opacity:0; } 19% { opacity:.85; } 27% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-s1 { 0%,58% { opacity:0; } 64% { opacity:.85; } 72% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-s2 { 0%,22% { opacity:0; } 28% { opacity:.85; } 36% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-s3 { 0%,26% { opacity:0; } 32% { opacity:.85; } 40% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-f1 { 0%,34% { opacity:0; } 38% { opacity:.85; } 46% { opacity:0; } 100% { opacity:0; } }
+      @keyframes gl-f2 { 0%,37% { opacity:0; } 41% { opacity:.85; } 49% { opacity:0; } 100% { opacity:0; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .mod, .glow { animation: none; }
+        .glow { opacity: 0; }
+      }
+    </style>
+  </defs>
+  <g>
+    <rect x="340" y="90" width="520" height="420" rx="16" fill="#0e141d" stroke="#222b38" stroke-width="1.5"></rect>
+    <line x1="340" y1="146" x2="860" y2="146" stroke="#1b2431" stroke-width="1"></line>
+    <line x1="340" y1="452" x2="860" y2="452" stroke="#1b2431" stroke-width="1"></line>
+    <line x1="520" y1="146" x2="520" y2="452" stroke="#1b2431" stroke-width="1"></line>
+    <rect x="548" y="212" width="250" height="8" rx="4" fill="#1a2230"></rect>
+    <rect x="548" y="236" width="196" height="8" rx="4" fill="#1a2230"></rect>
+    <rect x="548" y="260" width="224" height="8" rx="4" fill="#161e2b"></rect>
+    <rect x="548" y="292" width="290" height="116" rx="8" fill="#121a24" stroke="#1d2632" stroke-width="1"></rect>
+    <rect x="548" y="424" width="150" height="8" rx="4" fill="#161e2b"></rect>
+  </g>
+  <g>
+    <rect x="666" y="97" width="192" height="38" rx="8" fill="#34d3c2" fill-opacity="0.05" stroke="#34d3c2" stroke-width="1.3" stroke-dasharray="6 5"></rect>
+    <rect x="356" y="180" width="156" height="78" rx="9" fill="#34d3c2" fill-opacity="0.05" stroke="#34d3c2" stroke-width="1.3" stroke-dasharray="6 5"></rect>
+    <rect x="356" y="270" width="156" height="78" rx="9" fill="#34d3c2" fill-opacity="0.05" stroke="#34d3c2" stroke-width="1.3" stroke-dasharray="6 5"></rect>
+    <rect x="356" y="360" width="156" height="78" rx="9" fill="#34d3c2" fill-opacity="0.05" stroke="#34d3c2" stroke-width="1.3" stroke-dasharray="6 5"></rect>
+    <rect x="612" y="458" width="246" height="36" rx="16" fill="#34d3c2" fill-opacity="0.05" stroke="#34d3c2" stroke-width="1.3" stroke-dasharray="6 5"></rect>
+  </g>
+  <g>
+    <g>
+      <rect x="350" y="96" width="76" height="22" rx="6" fill="#0c121b" stroke="#212a37"></rect>
+      <circle cx="364" cy="107" r="3" fill="#34d3c2"></circle>
+      <text x="376" y="111" font-size="12" fill="#6b7787">header</text>
+    </g>
+    <g>
+      <rect x="350" y="152" width="82" height="22" rx="6" fill="#0c121b" stroke="#212a37"></rect>
+      <circle cx="364" cy="163" r="3" fill="#34d3c2"></circle>
+      <text x="376" y="167" font-size="12" fill="#6b7787">sidebar</text>
+    </g>
+    <g>
+      <rect x="350" y="456" width="72" height="22" rx="6" fill="#0c121b" stroke="#212a37"></rect>
+      <circle cx="364" cy="467" r="3" fill="#34d3c2"></circle>
+      <text x="376" y="471" font-size="12" fill="#6b7787">footer</text>
+    </g>
+    <g>
+      <rect x="530" y="152" width="62" height="22" rx="6" fill="#0c121b" stroke="#212a37"></rect>
+      <circle cx="544" cy="163" r="3" fill="#34d3c2"></circle>
+      <text x="556" y="167" font-size="12" fill="#6b7787">core</text>
+    </g>
+  </g>
+  <g>
+    <g class="mod h1">
+      <g>
+        <rect class="glow g-h1" x="-46" y="-21" width="92" height="42" rx="9" fill="none" stroke="#4aa8ff" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-42" y="-17" width="84" height="34" rx="7" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <rect x="-42" y="-17" width="5" height="34" rx="2" fill="#4aa8ff"></rect>
+        <circle cx="-26" cy="0" r="4" fill="#4aa8ff"></circle>
+        <rect x="-14" y="-3" width="38" height="6" rx="3" fill="#2c3543"></rect>
+      </g>
+    </g>
+    <g class="mod h2">
+      <g>
+        <rect class="glow g-h2" x="-46" y="-21" width="92" height="42" rx="9" fill="none" stroke="#34d3c2" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-42" y="-17" width="84" height="34" rx="7" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <rect x="-42" y="-17" width="5" height="34" rx="2" fill="#34d3c2"></rect>
+        <circle cx="-26" cy="0" r="4" fill="#34d3c2"></circle>
+        <rect x="-14" y="-3" width="38" height="6" rx="3" fill="#2c3543"></rect>
+      </g>
+    </g>
+    <g class="mod s3">
+      <g>
+        <rect class="glow g-s3" x="-82" y="-43" width="164" height="86" rx="11" fill="none" stroke="#34d3c2" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-78" y="-39" width="156" height="78" rx="9" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <rect x="-78" y="-39" width="5" height="78" rx="2" fill="#34d3c2"></rect>
+        <rect x="-58" y="-16" width="92" height="7" rx="3.5" fill="#2c3543"></rect>
+        <rect x="-58" y="2" width="64" height="7" rx="3.5" fill="#222c39"></rect>
+        <circle cx="62" cy="-23" r="11" fill="#34d3c2"></circle>
+        <text x="62" y="-19.5" font-size="10" font-weight="600" text-anchor="middle" fill="#0a0e14">30</text>
+      </g>
+    </g>
+    <g class="mod s1">
+      <g>
+        <rect class="glow g-s1" x="-82" y="-43" width="164" height="86" rx="11" fill="none" stroke="#8b7bff" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-78" y="-39" width="156" height="78" rx="9" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <rect x="-78" y="-39" width="5" height="78" rx="2" fill="#8b7bff"></rect>
+        <rect x="-58" y="-16" width="92" height="7" rx="3.5" fill="#2c3543"></rect>
+        <rect x="-58" y="2" width="64" height="7" rx="3.5" fill="#222c39"></rect>
+        <circle cx="62" cy="-23" r="11" fill="#8b7bff"></circle>
+        <text x="62" y="-19.5" font-size="10" font-weight="600" text-anchor="middle" fill="#0a0e14">10</text>
+      </g>
+    </g>
+    <g class="mod s2">
+      <g>
+        <rect class="glow g-s2" x="-82" y="-43" width="164" height="86" rx="11" fill="none" stroke="#46d18a" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-78" y="-39" width="156" height="78" rx="9" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <rect x="-78" y="-39" width="5" height="78" rx="2" fill="#46d18a"></rect>
+        <rect x="-58" y="-16" width="92" height="7" rx="3.5" fill="#2c3543"></rect>
+        <rect x="-58" y="2" width="64" height="7" rx="3.5" fill="#222c39"></rect>
+        <circle cx="62" cy="-23" r="11" fill="#46d18a"></circle>
+        <text x="62" y="-19.5" font-size="10" font-weight="600" text-anchor="middle" fill="#0a0e14">20</text>
+      </g>
+    </g>
+    <g class="mod f1">
+      <g>
+        <rect class="glow g-f1" x="-59" y="-20" width="118" height="40" rx="18" fill="none" stroke="#4aa8ff" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-55" y="-16" width="110" height="32" rx="16" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <circle cx="-38" cy="0" r="5" fill="#4aa8ff"></circle>
+        <rect x="-24" y="-3" width="56" height="6" rx="3" fill="#2c3543"></rect>
+      </g>
+    </g>
+    <g class="mod f2">
+      <g>
+        <rect class="glow g-f2" x="-59" y="-20" width="118" height="40" rx="18" fill="none" stroke="#8b7bff" stroke-width="2" filter="url(#glow)"></rect>
+        <rect x="-55" y="-16" width="110" height="32" rx="16" fill="#151d27" stroke="#2a3340" stroke-width="1"></rect>
+        <circle cx="-38" cy="0" r="5" fill="#8b7bff"></circle>
+        <rect x="-24" y="-3" width="56" height="6" rx="3" fill="#2c3543"></rect>
+      </g>
+    </g>
+  </g>
+</svg>

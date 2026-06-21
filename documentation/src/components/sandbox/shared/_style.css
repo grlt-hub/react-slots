@@ -1,0 +1,81 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #0e141d;
+}
+
+aside {
+  border-radius: 16px;
+  border: 1px solid #222b38;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+aside h2 {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 10px;
+  background: #0c121b;
+  border: 1px solid #212a37;
+  border-radius: 7px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 300;
+  color: #6b7787;
+  margin-bottom: 12px;
+}
+
+aside h2::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d3c2;
+  flex: none;
+}
+
+aside button {
+  align-self: flex-start;
+  padding: 8px 14px;
+  background: #151d27;
+  border: 1px solid #2a3340;
+  border-radius: 8px;
+  color: #e6eaf0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+aside button:hover {
+  border-color: #34d3c2;
+  color: #fff;
+}
+
+aside input {
+  align-self: flex-start;
+  padding: 8px 12px;
+  background: #0c121b;
+  border: 1px solid #2a3340;
+  border-radius: 8px;
+  color: #e6eaf0;
+  font-size: 13px;
+  outline: none;
+}
+
+aside input:focus {
+  border-color: #34d3c2;
+}
+
+aside input::placeholder {
+  color: #6b7787;
+}
+
+aside p {
+  margin: 0;
+  color: #6b7787;
+  font-size: 13px;
+}

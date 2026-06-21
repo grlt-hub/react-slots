@@ -1,7 +1,11 @@
 packages:
   - packages/*
+  - documentation
 
 allowBuilds:
+  es5-ext: false
+  esbuild: true
   lefthook: true
+  sharp: true
 
 minimumReleaseAge: 4320

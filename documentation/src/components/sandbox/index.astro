@@ -1,0 +1,20 @@
+---
+import SandpackEditor from "./index.tsx"
+import { Code } from "@astrojs/starlight/components"
+
+// Accepts either `code` (single-file) or `files` (a glob map of path → raw source, with index.tsx
+// as the entry). Pick the entry source for the static, mobile-only preview.
+const { code, options, files } = Astro.props
+const entrySource =
+  code ??
+  Object.entries(files ?? {}).find(([path]) => /\/(index\.tsx|index\.ts|App\.tsx)$/.test(path))?.[1] ??
+  Object.values(files ?? {})[0] ??
+  ""
+const sourceCode = entrySource.replace(/^[ \t]*\/\/\s*oxfmt-ignore[ \t]*\r?\n?/gm, "")
+---
+
+<div class="sandbox-block">
+  {/* mobile: static highlighted code; desktop: the live editor (toggled in sandbox.css) */}
+  <Code class="sandbox-code" code={sourceCode} lang="tsx" />
+  <SandpackEditor client:only="react" code={code} files={files} options={options} />
+</div>

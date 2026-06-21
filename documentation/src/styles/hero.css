@@ -1,0 +1,203 @@
+/* Landing/hero styling. Theme-aware: dark theme gets a near-black doc-wide surface and a
+   soft teal glow; light theme stays clean and light. Colors use Starlight tokens so text
+   adapts to the active theme automatically. Starlight's own rules use :where() (zero
+   specificity), so plain selectors here win without !important. */
+
+/* ── Doc-wide dark surface (dark theme only) ────────────────────────────────────────
+   Unify the whole dark doc with the hero's near-black so there is no seam. */
+:root[data-theme="dark"] {
+  --sl-color-bg: #0a0e14;
+  --sl-color-bg-nav: #0a0e14;
+  --sl-color-bg-sidebar: #0a0e14;
+
+  /* brand accent (mint) — recolors links, heading anchors, active states, etc. */
+  --sl-color-accent-low: #0b2b28;
+  --sl-color-accent: #1ba898;
+  --sl-color-accent-high: #a5f0e6;
+  --sl-color-text-accent: #34d3c2;
+}
+
+:root[data-theme="light"] {
+  /* darker mint so accent text stays readable on a white background */
+  --sl-color-accent-low: #cdf3ed;
+  --sl-color-accent: #14b8a6;
+  --sl-color-accent-high: #0a4a43;
+  --sl-color-text-accent: #0d9488;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────────────── */
+/* Glassy translucent header (app-compose style): blurred, semi-transparent, no hairline. */
+header.header {
+  background: color-mix(in srgb, var(--sl-color-bg) 65%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom-color: transparent;
+}
+
+/* Social icons in the brand accent (mint). */
+.social-icons a {
+  color: #34d3c2;
+}
+
+.social-icons a:hover {
+  color: #57e0d1;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(3rem, 6vmin, 7rem);
+}
+
+/* Soft ambient teal glow behind the hero — dark theme only, kept faint and offset so the
+   opaque dashboard panel does not "cut a hole" in a bright spot. Full viewport width. */
+:root[data-theme="dark"] .hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -8rem;
+  bottom: -4rem;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: radial-gradient(46% 60% at 70% 46%, rgba(52, 211, 194, 0.07), transparent 72%);
+}
+
+/* Typography: large and bold; color follows the theme via Starlight tokens. */
+.hero h1 {
+  color: var(--sl-color-white);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+}
+
+.hero .tagline {
+  color: var(--sl-color-gray-2);
+  font-size: clamp(1rem, 0.55rem + 1vw, 1.3rem);
+  max-width: 36ch;
+}
+
+/* CTA: mint primary with dark text (works on both themes), minimal secondary. */
+.hero .sl-link-button.primary {
+  background: #34d3c2;
+  border-color: #34d3c2;
+  color: #06231f;
+}
+
+.hero .sl-link-button.primary:hover {
+  background: #57e0d1;
+  border-color: #57e0d1;
+  color: #06231f;
+}
+
+.hero .sl-link-button.minimal {
+  color: var(--sl-color-gray-1);
+}
+
+/* The animation. Starlight boxes hero images into a 400x400 square (letterboxing a
+   landscape SVG) and caps width — override to the real aspect ratio and give it more room. */
+.hero img {
+  aspect-ratio: 568 / 468;
+  height: auto;
+  width: min(100%, 30rem);
+}
+
+@media (min-width: 50rem) {
+  .hero {
+    grid-template-columns: 6fr 5fr;
+  }
+
+  .hero img {
+    width: min(100%, 40rem);
+  }
+}
+
+/* ── Feature cards ──────────────────────────────────────────────────────────────────
+   Tinted icon chips, single row, accent palette shared with the hero animation.
+   These selectors are unlayered, so they win over Starlight's @layer styles. */
+.card-grid {
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 44rem) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 72rem) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.card {
+  --tint: 52, 211, 194; /* overridden per card below */
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background:
+    radial-gradient(130% 90% at 50% -10%, rgba(var(--tint), 0.07), transparent 55%),
+    #0e141d;
+  padding: clamp(1.1rem, 0.6rem + 1.2vw, 1.6rem);
+  gap: 0;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.card:hover {
+  border-color: rgba(var(--tint), 0.35);
+}
+
+/* same accent palette as the hero animation modules */
+.card:nth-child(1) { --tint: 52, 211, 194; }  /* teal   */
+.card:nth-child(2) { --tint: 74, 168, 255; }  /* blue   */
+.card:nth-child(3) { --tint: 139, 123, 255; } /* purple */
+.card:nth-child(4) { --tint: 70, 209, 138; }  /* green  */
+
+.card .title {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+
+/* icon chip */
+.card .icon {
+  box-sizing: border-box;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.62rem;
+  margin-bottom: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--tint), 0.3);
+  background: linear-gradient(155deg, rgba(var(--tint), 0.26), rgba(var(--tint), 0.07));
+  color: rgb(var(--tint));
+}
+
+.card .body {
+  margin-top: 0.7rem;
+  color: var(--sl-color-gray-2);
+}
+
+/* inline code in card bodies: accent-tinted, no chip background */
+.card .body code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: rgb(var(--tint));
+}
+
+/* Light theme: white card surface with a soft shadow instead of the dark fill. */
+:root[data-theme="light"] .card {
+  border-color: rgba(15, 23, 42, 0.08);
+  background:
+    radial-gradient(130% 90% at 50% -10%, rgba(var(--tint), 0.08), transparent 55%),
+    #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}

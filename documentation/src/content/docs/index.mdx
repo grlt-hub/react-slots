@@ -1,0 +1,96 @@
+---
+title: React Slots
+description: Declarative slot system for React. Build extensible, plugin-ready components with dynamic injection.
+template: splash
+hero:
+  tagline: Build extensible React applications with slot-based architecture. Declare named extension points and inject content into them from anywhere — without editing the components that declare them.
+  image:
+    dark: ../../assets/hero.svg
+    light: ../../assets/hero-light.svg
+    alt: A UI wireframe with named slots — header, sidebar, core, footer — into which plugin modules fly in and dock.
+  actions:
+    - text: Example
+      link: "#example"
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/grlt-hub/react-slots
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components"
+import Sandbox from "../../components/sandbox/index.astro"
+
+export const exampleFiles = import.meta.glob("./example/*.{tsx,ts,css}", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+})
+
+export const orderingFiles = import.meta.glob("./ordering/*.{tsx,ts,css}", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+})
+
+export const propsFiles = import.meta.glob("./props/*.{tsx,ts,css}", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+})
+
+export const filteringFiles = import.meta.glob("./filtering/*.{tsx,ts,css}", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+})
+
+## Why React Slots?
+
+React has no built-in slot system. When you build extensible apps — dashboards with plugins, host
+shells with third-party modules — you fall back on prop drilling, ad-hoc context, or render props.
+**React Slots** gives you named extension points and lets content be injected into them from
+anywhere in your codebase.
+
+## What you get
+
+<CardGrid>
+  <Card title="Inject from anywhere" icon="add-document">
+    Plugins and separate packages call `insert()` to dock components into a slot — from anywhere, with no prop drilling
+    and no coupling between the host and what fills it.
+  </Card>
+  <Card title="Control what renders" icon="list-format">
+    Decide what shows and in what shape: `order` for render order, `filter` to gate rendering, and `mapProps` to reshape
+    the props a slot passes down.
+  </Card>
+  <Card title="Know what's in a slot" icon="magnifier">
+    React to slot contents with `useCount` and `usePresence` — e.g. render a heading only when the slot actually has
+    visible content.
+  </Card>
+  <Card title="Type-safe & lightweight" icon="approve-check">
+    Fully typed slot props out of the box, a runtime under ~2&nbsp;KB gzipped, and React 16.8 → 19 support.
+  </Card>
+</CardGrid>
+
+## Example
+
+The core knows nothing about what fills it — content is injected from outside, and `order` decides
+the sequence. Edit the code; the preview re-runs as you type.
+
+<Sandbox files={exampleFiles} />
+
+## Ordering
+
+<Sandbox files={orderingFiles} />
+
+## Passing Props
+
+<Sandbox files={propsFiles} />
+
+## Filtering
+
+<Sandbox files={filteringFiles} />
+
+## useCount
+
+## usePresence

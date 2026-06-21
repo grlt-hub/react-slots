@@ -1,0 +1,38 @@
+/* The live Sandpack editor is heavy and cramped on small screens, so we show it only on desktop
+   and fall back to the static, syntax-highlighted code block on mobile. */
+@media (min-width: 800px) {
+  .sandbox-code {
+    display: none;
+  }
+}
+@media (max-width: 799px) {
+  .sandbox {
+    display: none;
+  }
+}
+
+.sandbox {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #11161f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.5),
+    0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="light"] .sandbox {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 32px rgba(15, 23, 42, 0.1),
+    0 3px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* the editor column carries an inline px height from the prop; let the layout fill it cleanly */
+.sandbox .sp-layout {
+  border: 0;
+}

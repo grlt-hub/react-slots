@@ -1,0 +1,354 @@
+---
+// Custom package-manager install widget: a terminal-styled tab switcher (npm / pnpm / yarn /
+// bun) with a copy button. Replaces Starlight's <Tabs>/<TabItem> for the install block so the
+// look matches the brand (mint accent, near-black surface). Pure HTML + a tiny vanilla script —
+// no React island — so it adds no hydration cost.
+//
+// Usage:  <PackageManagers pkg="@grlt-hub/react-slots" />
+//         <PackageManagers pkg="@grlt-hub/react-slots" dev />   {/* devDependency */}
+//
+// Tab choice persists in localStorage and syncs across every instance sharing `syncKey`.
+
+interface Props {
+  /** Package to install, e.g. "@grlt-hub/react-slots". */
+  pkg: string
+  /** Install as a devDependency. */
+  dev?: boolean
+  /** Instances sharing this key switch together and persist the choice. */
+  syncKey?: string
+}
+
+const { pkg, dev = false, syncKey = "pkg" } = Astro.props
+
+// Exact-pinned install commands per manager (matches the prior --save-exact / --exact block).
+const managers: { id: string; cmd: string }[] = [
+  { id: "npm", cmd: `npm install ${dev ? "--save-dev " : ""}--save-exact ${pkg}` },
+  { id: "pnpm", cmd: `pnpm add ${dev ? "--save-dev " : ""}--save-exact ${pkg}` },
+  { id: "yarn", cmd: `yarn add ${dev ? "--dev " : ""}--exact ${pkg}` },
+  { id: "bun", cmd: `bun add ${dev ? "--dev " : ""}--exact ${pkg}` },
+]
+
+const uid = `pm-${syncKey}`
+---
+
+<div class="pm not-content" data-pm-root data-sync-key={syncKey}>
+  <div class="pm-bar">
+    <div class="pm-tabs" role="tablist" aria-label="Package manager">
+      {
+        managers.map((m, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="pm-tab"
+            id={`${uid}-tab-${m.id}`}
+            data-pm-tab={m.id}
+            aria-selected={i === 0 ? "true" : "false"}
+            aria-controls={`${uid}-panel-${m.id}`}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            {m.id}
+          </button>
+        ))
+      }
+    </div>
+
+    <button type="button" class="pm-copy" data-pm-copy aria-label="Copy install command">
+      <svg class="pm-icon pm-icon-copy" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+        <rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"></rect>
+        <path
+          d="M5 15V5a2 2 0 0 1 2-2h8"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"></path>
+      </svg>
+      <svg class="pm-icon pm-icon-check" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+        <path
+          d="M5 13l4 4L19 7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+      <span class="pm-copy-label">copy</span>
+    </button>
+  </div>
+
+  <div class="pm-body">
+    {/* prettier-ignore — keep the <pre> body on one line: white-space:pre would render any
+        indentation/newline text nodes as literal blank space before the prompt. */}
+    {
+      managers.map((m, i) => (
+        // prettier-ignore
+        <pre class="pm-panel" role="tabpanel" id={`${uid}-panel-${m.id}`} aria-labelledby={`${uid}-tab-${m.id}`} data-pm-panel={m.id} data-cmd={m.cmd} hidden={i !== 0}><span class="pm-prompt" aria-hidden="true">$</span><code>{m.cmd}</code></pre>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .pm {
+    margin-block: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: #0e141d;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 6px 20px rgba(0, 0, 0, 0.35);
+    font-family: var(--__sl-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  }
+
+  /* ── Header bar: tabs left, copy button right ───────────────────────────── */
+  .pm-bar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .pm-tabs {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .pm-tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0.7rem 0;
+    margin: 0;
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.15s ease;
+  }
+
+  .pm-tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px; /* sit on top of the header's bottom border */
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--sl-color-text-accent);
+    transform: scaleX(0);
+    transition: transform 0.18s ease;
+  }
+
+  .pm-tab:hover {
+    color: var(--sl-color-white);
+  }
+
+  .pm-tab[aria-selected="true"] {
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+
+  .pm-tab[aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .pm-tab:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ── Copy button ────────────────────────────────────────────────────────── */
+  .pm-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    align-self: center;
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0.3rem 0.4rem;
+    margin: 0;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+  }
+
+  .pm-copy:hover {
+    color: var(--sl-color-white);
+  }
+
+  .pm-copy:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+  }
+
+  .pm-icon {
+    flex: none;
+  }
+
+  .pm-icon-check {
+    display: none;
+  }
+
+  /* copied state: swap icon → check, label → "copied", tint accent */
+  .pm-copy[data-copied] {
+    color: var(--sl-color-text-accent);
+  }
+
+  .pm-copy[data-copied] .pm-icon-copy {
+    display: none;
+  }
+
+  .pm-copy[data-copied] .pm-icon-check {
+    display: inline;
+  }
+
+  /* ── Terminal body ──────────────────────────────────────────────────────── */
+  .pm-body {
+    overflow-x: auto;
+  }
+
+  .pm-panel {
+    margin: 0;
+    padding: 0.95rem 1rem;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre;
+    color: var(--sl-color-white);
+  }
+
+  .pm-panel[hidden] {
+    display: none;
+  }
+
+  .pm-prompt {
+    color: var(--sl-color-text-accent);
+    user-select: none;
+    margin-right: 0.55rem;
+  }
+
+  .pm-panel code {
+    font: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* ── Light theme ──────────────────────────────────────────────────────────
+     Only the dark surface needs swapping. Text uses Starlight's --sl-color-white /
+     --sl-color-gray-3 tokens, which already flip to dark on light themes, so no color
+     overrides here (overriding them to --sl-color-black would invert to near-white). */
+  :global(:root[data-theme="light"]) .pm {
+    border-color: rgba(15, 23, 42, 0.1);
+    background: #f6f7f9;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  :global(:root[data-theme="light"]) .pm-bar {
+    border-bottom-color: rgba(15, 23, 42, 0.1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pm-tab,
+    .pm-tab::after,
+    .pm-copy {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Package-manager tab switcher: click / arrow-key tab nav, copy-to-clipboard, and
+  // localStorage persistence that syncs every instance sharing the same `syncKey`.
+  const STORE = (key: string) => `pm-pref:${key}`
+
+  function setup(root: HTMLElement) {
+    if (root.dataset.pmReady) return
+    root.dataset.pmReady = "true"
+
+    const syncKey = root.dataset.syncKey || "pkg"
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-pm-tab]"))
+    const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-pm-panel]"))
+    const copyBtn = root.querySelector<HTMLButtonElement>("[data-pm-copy]")
+    const ids = tabs.map((t) => t.dataset.pmTab!)
+    let copyTimer: ReturnType<typeof setTimeout> | undefined
+
+    const select = (id: string, opts: { focus?: boolean; persist?: boolean } = {}) => {
+      if (!ids.includes(id)) return
+      for (const t of tabs) {
+        const on = t.dataset.pmTab === id
+        t.setAttribute("aria-selected", on ? "true" : "false")
+        t.tabIndex = on ? 0 : -1
+        if (on && opts.focus) t.focus()
+      }
+      for (const p of panels) p.hidden = p.dataset.pmPanel !== id
+
+      if (opts.persist === false) return
+      try {
+        localStorage.setItem(STORE(syncKey), id)
+      } catch {}
+      // keep sibling widgets (same syncKey) in step without re-persisting
+      for (const other of document.querySelectorAll<HTMLElement>(`[data-pm-root][data-sync-key="${syncKey}"]`)) {
+        if (other !== root) other.dispatchEvent(new CustomEvent("pm:sync", { detail: id }))
+      }
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(tab.dataset.pmTab!))
+      tab.addEventListener("keydown", (e) => {
+        let next = -1
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % tabs.length
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + tabs.length) % tabs.length
+        else if (e.key === "Home") next = 0
+        else if (e.key === "End") next = tabs.length - 1
+        if (next < 0) return
+        e.preventDefault()
+        select(tabs[next].dataset.pmTab!, { focus: true })
+      })
+    })
+
+    copyBtn?.addEventListener("click", async () => {
+      const active = panels.find((p) => !p.hidden)
+      const cmd = active?.dataset.cmd
+      if (!cmd) return
+      try {
+        await navigator.clipboard.writeText(cmd)
+      } catch {
+        return
+      }
+      copyBtn.dataset.copied = "true"
+      const label = copyBtn.querySelector(".pm-copy-label")
+      if (label) label.textContent = "copied"
+      clearTimeout(copyTimer)
+      copyTimer = setTimeout(() => {
+        delete copyBtn.dataset.copied
+        if (label) label.textContent = "copy"
+      }, 1600)
+    })
+
+    root.addEventListener("pm:sync", (e) => select((e as CustomEvent<string>).detail, { persist: false }))
+
+    // restore the persisted choice (no flash beyond the initial npm default)
+    try {
+      const saved = localStorage.getItem(STORE(syncKey))
+      if (saved && saved !== ids[0]) select(saved, { persist: false })
+    } catch {}
+  }
+
+  const init = () => document.querySelectorAll<HTMLElement>("[data-pm-root]").forEach(setup)
+  init()
+  // re-run after Starlight/Astro client-side navigations (no-op when view transitions are off)
+  document.addEventListener("astro:page-load", init)
+</script>

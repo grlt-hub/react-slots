@@ -1,0 +1,28 @@
+{
+  "name": "@grlt-hub/react-slots-docs",
+  "version": "4.0.0-beta.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^6.0.3",
+    "@astrojs/react": "5.0.7",
+    "@astrojs/starlight": "^0.40.0",
+    "@codesandbox/sandpack-react": "2.20.0",
+    "@grlt-hub/react-slots": "workspace:*",
+    "astro": "^6.4.8",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "sharp": "^0.35.1",
+    "starlight-llms-txt": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3"
+  }
+}
