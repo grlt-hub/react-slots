@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](http://semver.org).
 
 ## Unreleased
 
+### Added
+
+- `createSlot({ fallback })` — a component (no props) rendered while the slot has never received an insert. The first `insert` removes it for good: a later `clear` empties the slot but does not bring the fallback back. Emptiness is list-based — the fallback tracks `insert`/`clear`, not what children render. On the server it renders whenever nothing was inserted at render time, mirroring the client pre-insert state. Composes with `presence: true`; the fallback is not probed and never counts toward `useCount`/`usePresence`.
+
 ### Fixed
 
 - `filter` freeze is now concurrent-safe: a render attempt React abandons (an interrupted `startTransition`, a suspended attempt) can no longer leak a never-committed element into the frozen child. The freeze cache moved from a render-written ref to render-phase state.

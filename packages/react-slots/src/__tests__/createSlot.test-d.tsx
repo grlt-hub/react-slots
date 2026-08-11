@@ -342,6 +342,34 @@ describe("createSlot types", () => {
     })
   })
 
+  it("fallback receives no props, even on a typed slot", () => {
+    createSlot<{ userId: number }>({
+      fallback: (props) => {
+        expectTypeOf(props).toEqualTypeOf<EmptyObject>()
+
+        return null
+      },
+    })
+
+    // @ts-expect-error — fallback receives no props
+    createSlot<{ userId: number }>({ fallback: (props: { userId: number }) => <b>{props.userId}</b> })
+  })
+
+  it("fallback is optional and forbids props on a propless slot", () => {
+    createSlot({ fallback: () => null })
+    createSlot({})
+
+    // @ts-expect-error — fallback receives no props
+    createSlot({ fallback: (props: { name: string }) => <b>{props.name}</b> })
+  })
+
+  it("fallback composes with presence", () => {
+    const slot = createSlot<{ userId: number }>({ presence: true, fallback: () => null })
+
+    expectTypeOf(slot.useCount).toEqualTypeOf<() => number>()
+    expectTypeOf(slot.usePresence).toEqualTypeOf<() => readonly boolean[]>()
+  })
+
   it("convention: filter above mapProps — reversed order silently loses narrowing", () => {
     const slot = createSlot<{ kind: "str"; text: string } | { kind: "num"; value: number }>()
 
