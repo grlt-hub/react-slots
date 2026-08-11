@@ -745,7 +745,7 @@ describe("createSlot", () => {
   })
 
   it("renders fallback while nothing was ever inserted", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     const { container } = render(<slot.Root />)
 
@@ -753,7 +753,7 @@ describe("createSlot", () => {
   })
 
   it("does not render fallback when something was inserted before mount", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     slot.api.insert({ Component: () => <b>content</b> })
 
@@ -764,7 +764,7 @@ describe("createSlot", () => {
   })
 
   it("removes fallback when something is inserted after mount", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     const { container } = render(<slot.Root />)
 
@@ -779,7 +779,7 @@ describe("createSlot", () => {
   })
 
   it("does not bring fallback back after clear", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     slot.api.insert({ Component: () => <b>content</b> })
 
@@ -793,7 +793,7 @@ describe("createSlot", () => {
   })
 
   it("keeps fallback when clear is called before any insert", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     const { container } = render(<slot.Root />)
 
@@ -805,7 +805,7 @@ describe("createSlot", () => {
   })
 
   it("renders children inserted after clear, still without fallback", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     slot.api.insert({ Component: () => <b>first</b> })
 
@@ -829,31 +829,40 @@ describe("createSlot", () => {
     expect(container.innerHTML).toBe("")
   })
 
-  it("never re-renders fallback, no matter how Root props churn", () => {
+  it("passes slot props to Fallback and re-renders it when they change", () => {
+    const slot = createSlot<{ value: string }>({ Fallback: (props) => <i>{props.value}</i> })
+
+    const { container, rerender } = render(<slot.Root value="a" />)
+
+    expect(texts(container, "i")).toEqual(["a"])
+
+    rerender(<slot.Root value="b" />)
+
+    expect(texts(container, "i")).toEqual(["b"])
+  })
+
+  it("does not re-render Fallback on a same-value host re-render", () => {
     let renders = 0
 
-    const slot = createSlot<{ tick: number }>({
-      fallback: () => {
+    const slot = createSlot<{ value: string }>({
+      Fallback: (props) => {
         renders += 1
 
-        return <i>empty</i>
+        return <i>{props.value}</i>
       },
     })
 
-    const { container, rerender } = render(<slot.Root tick={1} />)
-
-    expect(texts(container, "i")).toEqual(["empty"])
+    const { rerender } = render(<slot.Root value="same" />)
 
     const before = renders
 
-    rerender(<slot.Root tick={2} />)
-    rerender(<slot.Root tick={3} />)
+    rerender(<slot.Root value="same" />)
 
     expect(renders).toBe(before)
   })
 
   it("fallback latch is shared between two mounted Roots of the same slot", () => {
-    const slot = createSlot({ fallback: () => <i>empty</i> })
+    const slot = createSlot({ Fallback: () => <i>empty</i> })
 
     const first = render(<slot.Root />)
     const second = render(<slot.Root />)
@@ -874,7 +883,7 @@ describe("createSlot", () => {
   })
 
   it("supports fallback on a presence slot", () => {
-    const slot = createSlot({ presence: true, fallback: () => <i>empty</i> })
+    const slot = createSlot({ presence: true, Fallback: () => <i>empty</i> })
 
     const { container } = render(<slot.Root />)
 

@@ -342,29 +342,42 @@ describe("createSlot types", () => {
     })
   })
 
-  it("fallback receives no props, even on a typed slot", () => {
+  it("Fallback receives the slot props of an explicit T", () => {
     createSlot<{ userId: number }>({
-      fallback: (props) => {
-        expectTypeOf(props).toEqualTypeOf<EmptyObject>()
+      Fallback: (props) => {
+        expectTypeOf(props).toEqualTypeOf<{ userId: number }>()
 
         return null
       },
     })
 
-    // @ts-expect-error — fallback receives no props
-    createSlot<{ userId: number }>({ fallback: (props: { userId: number }) => <b>{props.userId}</b> })
+    // @ts-expect-error — Fallback props must match the slot props
+    createSlot<{ userId: number }>({ Fallback: (props: { name: string }) => <b>{props.name}</b> })
   })
 
-  it("fallback is optional and forbids props on a propless slot", () => {
-    createSlot({ fallback: () => null })
+  it("Fallback receives no props on a slot without T", () => {
+    createSlot({
+      Fallback: (props) => {
+        expectTypeOf(props).toEqualTypeOf<EmptyObject>()
+
+        return null
+      },
+    })
     createSlot({})
 
-    // @ts-expect-error — fallback receives no props
-    createSlot({ fallback: (props: { name: string }) => <b>{props.name}</b> })
+    // @ts-expect-error — a propless slot gives Fallback no props
+    createSlot({ Fallback: (props: { name: string }) => <b>{props.name}</b> })
   })
 
-  it("fallback composes with presence", () => {
-    const slot = createSlot<{ userId: number }>({ presence: true, fallback: () => null })
+  it("does not infer T from the Fallback signature", () => {
+    // @ts-expect-error — slot props come only from the explicit type argument
+    const slot = createSlot({ Fallback: (props: { userId: number }) => <b>{props.userId}</b> })
+
+    expectTypeOf<ComponentProps<typeof slot.Root>>().toMatchTypeOf<EmptyObject>()
+  })
+
+  it("Fallback composes with presence", () => {
+    const slot = createSlot<{ userId: number }>({ presence: true, Fallback: (props) => <b>{props.userId}</b> })
 
     expectTypeOf(slot.useCount).toEqualTypeOf<() => number>()
     expectTypeOf(slot.usePresence).toEqualTypeOf<() => readonly boolean[]>()

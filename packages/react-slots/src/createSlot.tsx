@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import React, { memo, useState, type FunctionComponent, type NamedExoticComponent, type ReactElement } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
-import type { EmptyObject, Insertable, NormalizedProps, Payload } from "./payload"
+import type { Insertable, NormalizedProps, Payload } from "./payload"
 import { createPresenceStore, probe, type PresenceStore } from "./presenceStore"
 import { createStore, neverInserted, useStore } from "./store"
 
@@ -9,9 +9,13 @@ let idCounter = 0
 
 const EMPTY_PRESENCE: readonly boolean[] = []
 
-type SlotConfig = {
+// Blocks T inference from the Fallback signature: slot props come only from the
+// explicit type argument. The TS 5.4 intrinsic can't be used — consumers are pinned to 4.7.
+type NoInfer<T> = [T][T extends unknown ? 0 : never]
+
+type SlotConfig<T extends Insertable> = {
   presence?: boolean | undefined
-  fallback?: ((props: EmptyObject) => ReactNode) | undefined
+  Fallback?: ((props: NoInfer<NormalizedProps<T>>) => ReactNode) | undefined
 }
 
 type Slot<T extends Insertable> = {
@@ -27,9 +31,9 @@ type PresenceSlot<T extends Insertable> = Slot<T> & {
 const projectAllFalse = (items: readonly { id: string }[]): readonly boolean[] =>
   items.length === 0 ? EMPTY_PRESENCE : items.map(() => false)
 
-function createSlot<T extends Insertable = void>(config: SlotConfig & { presence: true }): PresenceSlot<T>
-function createSlot<T extends Insertable = void>(config?: SlotConfig): Slot<T>
-function createSlot<T extends Insertable = void>(config?: SlotConfig) {
+function createSlot<T extends Insertable = void>(config: SlotConfig<T> & { presence: true }): PresenceSlot<T>
+function createSlot<T extends Insertable = void>(config?: SlotConfig<T>): Slot<T>
+function createSlot<T extends Insertable = void>(config?: SlotConfig<T>) {
   if (!config?.presence) {
     type SlotProps = NormalizedProps<T> & object
     type Item = { id: string; order?: number | undefined } & (
@@ -78,13 +82,13 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
       store.insert(item)
     }) as Payload<T>
 
-    const Fallback = config?.fallback ? memo(config.fallback) : null
+    const Fallback = config?.Fallback ? memo(config.Fallback as FunctionComponent<SlotProps>) : null
 
     const Root = Fallback
       ? memo<SlotProps>((props) => {
           const items = useStore(store)
 
-          if (items.length === 0) return neverInserted(items) ? <Fallback /> : null
+          if (items.length === 0) return neverInserted(items) ? <Fallback {...props} /> : null
 
           return items.map((child) =>
             child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
@@ -148,13 +152,13 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
     store.insert(item)
   }) as Payload<T>
 
-  const Fallback = config.fallback ? memo(config.fallback) : null
+  const Fallback = config.Fallback ? memo(config.Fallback as FunctionComponent<SlotProps>) : null
 
   const Root = Fallback
     ? memo<SlotProps>((props) => {
         const items = useStore(store)
 
-        if (items.length === 0) return neverInserted(items) ? <Fallback /> : null
+        if (items.length === 0) return neverInserted(items) ? <Fallback {...props} /> : null
 
         return items.map((child) =>
           child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
