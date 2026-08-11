@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
-import { createStore } from "../store"
+import { createStore, neverInserted } from "../store"
 
 type Item = { order?: number; label?: string }
 
@@ -99,16 +99,45 @@ describe("createStore", () => {
     expect(snapshot.map((x) => x.label)).toEqual(["a"])
   })
 
-  it("empty state is the shared EMPTY reference", () => {
+  it("initial empty state is the shared EMPTY reference", () => {
     const first = createStore<Item>()
     const second = createStore<Item>()
 
     expect(first.get()).toBe(second.get())
+  })
+
+  it("cleared state is a stable shared reference, distinct from the initial one", () => {
+    const first = createStore<Item>()
+    const second = createStore<Item>()
+
+    const initial = first.get()
 
     first.insert({})
     first.clear()
+    second.insert({})
+    second.clear()
 
     expect(first.get()).toBe(second.get())
+    expect(first.get()).not.toBe(initial)
+    expect(first.get()).toEqual([])
+  })
+
+  it("neverInserted tells a pristine store from a cleared one", () => {
+    const store = createStore<Item>()
+
+    expect(neverInserted(store.get())).toBe(true)
+
+    store.clear()
+
+    expect(neverInserted(store.get())).toBe(true)
+
+    store.insert({})
+
+    expect(neverInserted(store.get())).toBe(false)
+
+    store.clear()
+
+    expect(neverInserted(store.get())).toBe(false)
   })
 
   it("stores are isolated from each other", () => {

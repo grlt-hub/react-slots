@@ -744,6 +744,156 @@ describe("createSlot", () => {
     expect(new Set(texts(container, "b")).size).toBe(1)
   })
 
+  it("renders fallback while nothing was ever inserted", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    const { container } = render(<slot.Root />)
+
+    expect(texts(container, "i")).toEqual(["empty"])
+  })
+
+  it("does not render fallback when something was inserted before mount", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    slot.api.insert({ Component: () => <b>content</b> })
+
+    const { container } = render(<slot.Root />)
+
+    expect(texts(container, "i")).toEqual([])
+    expect(texts(container, "b")).toEqual(["content"])
+  })
+
+  it("removes fallback when something is inserted after mount", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    const { container } = render(<slot.Root />)
+
+    expect(texts(container, "i")).toEqual(["empty"])
+
+    act(() => {
+      slot.api.insert({ Component: () => <b>content</b> })
+    })
+
+    expect(texts(container, "i")).toEqual([])
+    expect(texts(container, "b")).toEqual(["content"])
+  })
+
+  it("does not bring fallback back after clear", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    slot.api.insert({ Component: () => <b>content</b> })
+
+    const { container } = render(<slot.Root />)
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    expect(container.innerHTML).toBe("")
+  })
+
+  it("keeps fallback when clear is called before any insert", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    const { container } = render(<slot.Root />)
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    expect(texts(container, "i")).toEqual(["empty"])
+  })
+
+  it("renders children inserted after clear, still without fallback", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    slot.api.insert({ Component: () => <b>first</b> })
+
+    const { container } = render(<slot.Root />)
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    act(() => {
+      slot.api.insert({ Component: () => <b>second</b> })
+    })
+
+    expect(texts(container, "b")).toEqual(["second"])
+    expect(texts(container, "i")).toEqual([])
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    expect(container.innerHTML).toBe("")
+  })
+
+  it("never re-renders fallback, no matter how Root props churn", () => {
+    let renders = 0
+
+    const slot = createSlot<{ tick: number }>({
+      fallback: () => {
+        renders += 1
+
+        return <i>empty</i>
+      },
+    })
+
+    const { container, rerender } = render(<slot.Root tick={1} />)
+
+    expect(texts(container, "i")).toEqual(["empty"])
+
+    const before = renders
+
+    rerender(<slot.Root tick={2} />)
+    rerender(<slot.Root tick={3} />)
+
+    expect(renders).toBe(before)
+  })
+
+  it("fallback latch is shared between two mounted Roots of the same slot", () => {
+    const slot = createSlot({ fallback: () => <i>empty</i> })
+
+    const first = render(<slot.Root />)
+    const second = render(<slot.Root />)
+
+    expect(texts(first.container, "i")).toEqual(["empty"])
+    expect(texts(second.container, "i")).toEqual(["empty"])
+
+    act(() => {
+      slot.api.insert({ Component: () => <b>content</b> })
+    })
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    expect(first.container.innerHTML).toBe("")
+    expect(second.container.innerHTML).toBe("")
+  })
+
+  it("supports fallback on a presence slot", () => {
+    const slot = createSlot({ presence: true, fallback: () => <i>empty</i> })
+
+    const { container } = render(<slot.Root />)
+
+    expect(texts(container, "i")).toEqual(["empty"])
+
+    act(() => {
+      slot.api.insert({ Component: () => <b>content</b> })
+    })
+
+    expect(texts(container, "i")).toEqual([])
+    expect(texts(container, "b")).toEqual(["content"])
+
+    act(() => {
+      slot.api.clear()
+    })
+
+    expect(container.innerHTML).toBe("")
+  })
+
   it("mapProps receives only props that passed filter", () => {
     const slot = createSlot<{ kind: "str"; text: string } | { kind: "num"; value: number }>()
     const seen: string[] = []

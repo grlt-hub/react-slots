@@ -1,14 +1,18 @@
+import type { ReactNode } from "react"
 import React, { memo, useState, type FunctionComponent, type NamedExoticComponent, type ReactElement } from "react"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
-import type { Insertable, NormalizedProps, Payload } from "./payload"
+import type { EmptyObject, Insertable, NormalizedProps, Payload } from "./payload"
 import { createPresenceStore, probe, type PresenceStore } from "./presenceStore"
-import { createStore, useStore } from "./store"
+import { createStore, neverInserted, useStore } from "./store"
 
 let idCounter = 0
 
 const EMPTY_PRESENCE: readonly boolean[] = []
 
-type SlotConfig = { presence?: boolean | undefined }
+type SlotConfig = {
+  presence?: boolean | undefined
+  fallback?: ((props: EmptyObject) => ReactNode) | undefined
+}
 
 type Slot<T extends Insertable> = {
   Root: NamedExoticComponent<NormalizedProps<T> & object>
@@ -23,7 +27,7 @@ type PresenceSlot<T extends Insertable> = Slot<T> & {
 const projectAllFalse = (items: readonly { id: string }[]): readonly boolean[] =>
   items.length === 0 ? EMPTY_PRESENCE : items.map(() => false)
 
-function createSlot<T extends Insertable = void>(config: { presence: true }): PresenceSlot<T>
+function createSlot<T extends Insertable = void>(config: SlotConfig & { presence: true }): PresenceSlot<T>
 function createSlot<T extends Insertable = void>(config?: SlotConfig): Slot<T>
 function createSlot<T extends Insertable = void>(config?: SlotConfig) {
   if (!config?.presence) {
@@ -74,11 +78,23 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
       store.insert(item)
     }) as Payload<T>
 
-    const Root = memo<SlotProps>((props) =>
-      useStore(store).map((child) =>
-        child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
-      ),
-    )
+    const Fallback = config?.fallback ? memo(config.fallback) : null
+
+    const Root = Fallback
+      ? memo<SlotProps>((props) => {
+          const items = useStore(store)
+
+          if (items.length === 0) return neverInserted(items) ? <Fallback /> : null
+
+          return items.map((child) =>
+            child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
+          )
+        })
+      : memo<SlotProps>((props) =>
+          useStore(store).map((child) =>
+            child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
+          ),
+        )
 
     return { Root, api: { insert, clear: store.clear } }
   }
@@ -132,11 +148,23 @@ function createSlot<T extends Insertable = void>(config?: SlotConfig) {
     store.insert(item)
   }) as Payload<T>
 
-  const Root = memo<SlotProps>((props) =>
-    useStore(store).map((child) =>
-      child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
-    ),
-  )
+  const Fallback = config.fallback ? memo(config.fallback) : null
+
+  const Root = Fallback
+    ? memo<SlotProps>((props) => {
+        const items = useStore(store)
+
+        if (items.length === 0) return neverInserted(items) ? <Fallback /> : null
+
+        return items.map((child) =>
+          child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
+        )
+      })
+    : memo<SlotProps>((props) =>
+        useStore(store).map((child) =>
+          child.withProps ? <child.Child key={child.id} {...props} /> : <child.Child key={child.id} />,
+        ),
+      )
 
   const subscribe = (listener: () => void) => presence.subscribe(listener)
 
