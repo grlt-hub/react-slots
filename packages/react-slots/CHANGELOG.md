@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org).
 
 ### Added
 
-- `createSlot({ fallback })` — a component (no props) rendered while the slot has never received an insert. The first `insert` removes it for good: a later `clear` empties the slot but does not bring the fallback back. Emptiness is list-based — the fallback tracks `insert`/`clear`, not what children render. On the server it renders whenever nothing was inserted at render time, mirroring the client pre-insert state. Composes with `presence: true`; the fallback is not probed and never counts toward `useCount`/`usePresence`.
+- `createSlot({ Fallback })` — a component rendered while the slot has never received an insert. It receives exactly the slot props of `createSlot<T>` (none when `T` is not specified; `T` is never inferred from the `Fallback` signature). The first `insert` removes it for good: a later `clear` empties the slot but does not bring the fallback back. Emptiness is list-based — the fallback tracks `insert`/`clear`, not what children render. On the server it renders whenever nothing was inserted at render time, mirroring the client pre-insert state. Composes with `presence: true`; the fallback is not probed and never counts toward `useCount`/`usePresence`.
 
 ### Fixed
 
