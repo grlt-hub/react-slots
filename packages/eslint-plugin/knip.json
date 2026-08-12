@@ -9,5 +9,5 @@
 
   "ignoreDependencies": ["@grlt-hub/react-slots", "vitest"],
 
-  "vitest": { "config": "vitest.config.ts", "entry": "src/**/*.test.ts" }
+  "vitest": { "config": "vitest.config.ts", "entry": ["src/**/*.test.ts", "src/**/*.test-d.ts"] }
 }
