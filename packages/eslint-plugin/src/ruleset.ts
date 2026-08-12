@@ -1,7 +1,7 @@
-import type { TSESLint } from "@typescript-eslint/utils"
+import type { Linter } from "eslint"
 
 const recommended = {
   "react-slots/insert-options-order": "warn",
-} satisfies TSESLint.Linter.RulesRecord
+} satisfies Linter.RulesRecord
 
 export const ruleset = { recommended }
