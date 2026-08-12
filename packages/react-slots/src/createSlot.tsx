@@ -9,12 +9,10 @@ let idCounter = 0
 
 const EMPTY_PRESENCE: readonly boolean[] = []
 
-// Blocks T inference from the Fallback signature: slot props come only from the
-// explicit type argument. The TS 5.4 intrinsic can't be used — consumers are pinned to 4.7.
-type NoInfer<T> = [T][T extends unknown ? 0 : never]
-
 type SlotConfig<T extends Insertable> = {
   presence?: boolean | undefined
+  // NoInfer blocks T inference from the Fallback signature: slot props come only
+  // from the explicit type argument.
   Fallback?: ((props: NoInfer<NormalizedProps<T>>) => ReactNode) | undefined
 }
 
