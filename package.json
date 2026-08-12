@@ -25,20 +25,20 @@
     "publish-ci": "node ./scripts/publish-ci.ts"
   },
   "devDependencies": {
-    "@arethetypeswrong/core": "0.18.3",
-    "@types/node": "25.9.3",
-    "@types/semver": "7.7.1",
-    "@typescript/native-preview": "7.0.0-dev.20260618.1",
-    "bumpp": "11.1.0",
-    "knip": "6.17.1",
-    "lefthook": "2.1.9",
-    "oxfmt": "0.55.0",
-    "oxlint": "1.70.0",
-    "publint": "0.3.21",
-    "semver": "7.8.4",
-    "tsdown": "0.22.3",
+    "@arethetypeswrong/core": "0.18.5",
+    "@types/node": "26.2.0",
+    "@types/semver": "7.8.0",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "bumpp": "12.2.0",
+    "knip": "6.32.0",
+    "lefthook": "2.1.10",
+    "oxfmt": "0.62.0",
+    "oxlint": "1.77.0",
+    "publint": "0.3.23",
+    "semver": "7.8.5",
+    "tsdown": "0.22.14",
     "typescript": "6.0.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.10"
   },
   "packageManager": "pnpm@11.5.3+sha512.7ac1c919341c213a34dc0d02afb7143c5c26ac26ee8c4782deea821b8ac64d2134a081fd8941dae6e29bbb48f58dfc2b7fbceeccc07cb2f09d219d342a4969ed"
 }
