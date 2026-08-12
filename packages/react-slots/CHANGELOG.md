@@ -16,9 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org).
 
 ### Changed
 
+- **BREAKING:** React peer range floor raised from `>=16.8.0` to `>=16.14.0` (the range is now `>=16.14.0 <20.0.0`).
+- **BREAKING:** minimum supported TypeScript for consumers raised from 4.7 to 6.0. The published types now use the built-in `NoInfer` intrinsic (TS 5.4+) instead of a hand-rolled alias, and annotation-free `filter` narrowing on discriminated-union slot props (inferred type predicates, TS 5.5+) is now inside the supported range. Note: inferred predicates only fire when the check narrows the whole parameter (e.g. a discriminant check); a property-only check such as `(props) => props.user !== null` still requires an explicit `props is ...` guard on any TypeScript version.
 - The presence probe's `MutationObserver` now observes `childList` only (`subtree: true` was behaviorally inert: presence derives from the probe span's own child list).
 - Published bundles carry a `"use client"` directive (React Server Components boundary — hooks and `Root` are client-side).
 - The npm tarball now includes `LICENSE` and `CHANGELOG.md`.
+- README rewritten for the current API, including presence limitations (the tarball previously shipped the v3 README).
 
 ## v3.1.0
 
