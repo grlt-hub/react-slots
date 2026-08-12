@@ -72,12 +72,12 @@
     "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {
-    "@types/react": "19.2.16",
-    "@types/react-dom": "19.2.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
     "@types/use-sync-external-store": "1.5.0",
-    "happy-dom": "20.10.1",
-    "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "happy-dom": "20.11.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "peerDependencies": {
     "react": ">=16.8.0 <20.0.0"
