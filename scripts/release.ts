@@ -9,7 +9,7 @@ try {
   })
 
   console.log(
-    `New release ${result.newVersion} is ready, waiting for confirmation at https://github.com/grlt-hub/react-slots/actions`,
+    `Release ${result.newVersion} pushed. Approve the Release environment at https://github.com/grlt-hub/react-slots/actions, then review and approve both packages in Staged Packages on https://www.npmjs.com/ with 2FA.`,
   )
 } catch (err) {
   console.error(err)

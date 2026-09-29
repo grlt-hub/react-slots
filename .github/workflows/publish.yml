@@ -10,7 +10,7 @@ permissions: {}
 jobs:
   publish:
     if: github.repository == 'grlt-hub/react-slots'
-    name: Publish React-Slots
+    name: Stage React-Slots release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,7 +34,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run build
         run: pnpm build
@@ -45,5 +45,20 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Publish
-        run: npm i -g npm@^11.5.2 && pnpm run publish-ci "${GITHUB_REF_NAME}"
+      # pnpm 11 implements staged publishing natively; no npm CLI upgrade is needed.
+      - name: Stage packages on npm
+        run: pnpm run publish-ci "${GITHUB_REF_NAME}"
+
+      - name: Explain npm approval
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## npm approval required
+
+          This workflow stages releases; it does not make them publicly available.
+          Open **Staged Packages** on [npmjs.com](https://www.npmjs.com/), review
+          `@grlt-hub/react-slots` and `@grlt-hub/eslint-plugin-react-slots`, and approve
+          each package with 2FA. Stage IDs are printed in the staging step above.
+
+          You can also approve each stage locally with `pnpm stage approve <stage-id>`.
+          Approval publishes the uploaded artifact with its CI provenance; no rebuild is needed.
+          EOF

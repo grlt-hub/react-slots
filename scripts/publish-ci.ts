@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process"
+import { execFileSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import semver from "semver"
@@ -20,12 +20,31 @@ if (pkg.version !== version) {
   throw new Error(`Package version from tag "${version}" mismatches with the current version "${pkg.version}"`)
 }
 
-const tag = semver.prerelease(version)?.[0]
+const tag = String(semver.prerelease(version)?.[0] ?? "latest")
+const dryRun = process.env.PUBLISH_DRY_RUN === "true"
 
-console.log("Publishing version", version, "with tag", tag || "latest")
+console.log(dryRun ? "Dry run: staging version" : "Staging version", version, "with tag", tag)
 
-if (tag) {
-  execSync(`pnpm -r publish --provenance --access public --no-git-checks --tag ${tag}`, { stdio: "inherit" })
-} else {
-  execSync(`pnpm -r publish --provenance --access public --no-git-checks`, { stdio: "inherit" })
+execFileSync(
+  "pnpm",
+  [
+    "-r",
+    "stage",
+    "publish",
+    "--provenance",
+    "--ignore-scripts",
+    "--access",
+    "public",
+    "--no-git-checks",
+    "--tag",
+    tag,
+    ...(dryRun ? ["--dry-run"] : []),
+  ],
+  { stdio: "inherit" },
+)
+
+if (!dryRun) {
+  console.log(
+    "Staging finished. Review both packages in Staged Packages on https://www.npmjs.com/ and approve each with 2FA. They are not live until approved.",
+  )
 }
