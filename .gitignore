@@ -10,7 +10,6 @@ bench-results*.json
 node_modules
 dist/
 storybook-static
-.astro/
 .vitest-attachments/
 __screenshots__/
 

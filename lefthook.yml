@@ -18,10 +18,7 @@ pre-commit:
       run: pnpm oxfmt --write {staged_files}
       stage_fixed: true
       exclude:
-        - "documentation/**"
         - "pnpm-lock.yaml"
     oxlint:
       glob: "*.{ts,tsx}"
-      exclude:
-        - "documentation/**"
       run: pnpm oxlint {staged_files}
