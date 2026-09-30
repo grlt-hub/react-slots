@@ -13,7 +13,7 @@ if (version.startsWith("v")) {
 
 if (!semver.valid(version)) throw new Error(`Cannot parse version: "${version}"`)
 
-const pkgPath = join(import.meta.dirname, "..", "package.json")
+const pkgPath = join(import.meta.dirname, "../../..", "package.json")
 const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"))
 
 if (pkg.version !== version) {

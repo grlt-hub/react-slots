@@ -14,9 +14,6 @@ importers:
       '@types/node':
         specifier: 26.2.0
         version: 26.2.0
-      '@types/semver':
-        specifier: 7.8.0
-        version: 7.8.0
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260707.2
         version: 7.0.0-dev.20260707.2
@@ -38,9 +35,6 @@ importers:
       publint:
         specifier: 0.3.23
         version: 0.3.23
-      semver:
-        specifier: 7.8.5
-        version: 7.8.5
       tsdown:
         specifier: 0.22.14
         version: 0.22.14(@arethetypeswrong/core@0.18.5)(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.24.2)(publint@0.3.23)(typescript@6.0.3)
@@ -94,6 +88,16 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+
+  scripts/publish-ci:
+    dependencies:
+      semver:
+        specifier: 7.8.5
+        version: 7.8.5
+    devDependencies:
+      '@types/semver':
+        specifier: 7.8.0
+        version: 7.8.0
 
 packages:
 
