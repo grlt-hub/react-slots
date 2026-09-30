@@ -1,6 +1,6 @@
-import { execSync } from "node:child_process"
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
+import { execFileSync } from "node:child_process"
+import { readFileSync, statSync } from "node:fs"
+import { join, resolve } from "node:path"
 import semver from "semver"
 
 let version = process.argv[2]
@@ -20,12 +20,27 @@ if (pkg.version !== version) {
   throw new Error(`Package version from tag "${version}" mismatches with the current version "${pkg.version}"`)
 }
 
-const tag = semver.prerelease(version)?.[0]
+const tarball = process.argv[3]
 
-console.log("Publishing version", version, "with tag", tag || "latest")
+if (!tarball) throw new Error("No package tarball specified")
+if (!tarball.endsWith(".tgz")) throw new Error(`Expected a .tgz file: "${tarball}"`)
 
-if (tag) {
-  execSync(`pnpm -r publish --provenance --access public --no-git-checks --tag ${tag}`, { stdio: "inherit" })
-} else {
-  execSync(`pnpm -r publish --provenance --access public --no-git-checks`, { stdio: "inherit" })
+const tarballPath = resolve(tarball)
+
+if (!statSync(tarballPath).isFile()) throw new Error(`Not a file: "${tarball}"`)
+
+const archivePkg = JSON.parse(execFileSync("tar", ["-xOf", tarballPath, "package/package.json"], { encoding: "utf-8" }))
+
+if (archivePkg.version !== version) {
+  throw new Error(`Package version from tag "${version}" mismatches with the archive version "${archivePkg.version}"`)
 }
+
+const tag = semver.prerelease(version)?.[0] ?? "latest"
+
+console.log("Staging archive", tarball, "with version", version, "and tag", tag)
+
+execFileSync(
+  "npm",
+  ["stage", "publish", tarballPath, "--provenance", "--access", "public", "--ignore-scripts", "--tag", String(tag)],
+  { stdio: "inherit" },
+)
