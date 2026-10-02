@@ -5,6 +5,7 @@
 - Repository: https://github.com/grlt-hub/react-slots
 - npm: https://www.npmjs.com/package/@grlt-hub/react-slots
 - License: MIT
+- Maintainers: [Release process](RELEASE.md)
 - Current major: v5. The v3 API (`createSlots`, `createSlotIdentifier`, `when`, effector peer dependencies) is gone; v5 has a single factory `createSlot` and no effector.
 
 ## Install
