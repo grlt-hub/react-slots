@@ -1,15 +1,19 @@
 name: Publish
 
 on:
-  push:
-    tags:
-      - "v*"
+  pull_request:
+    types: [closed]
+    branches: [main, alpha]
 
 permissions: {}
 
 jobs:
   build-artifacts:
-    if: github.repository == 'grlt-hub/react-slots'
+    if: >-
+      github.repository == 'grlt-hub/react-slots' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
     name: Build package tarballs
     runs-on: ubuntu-latest
     permissions:
@@ -33,7 +37,9 @@ jobs:
 
       - name: Resolve publish tag
         id: release
-        run: node scripts/resolve-publish-tag.ts "${GITHUB_REF_NAME}" npm_tag
+        run: |
+          VERSION="$(jq -r .version package.json)"
+          node scripts/resolve-publish-tag.ts "$VERSION" npm_tag
 
       - name: Upload package tarballs
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -74,3 +80,32 @@ jobs:
         env:
           NPM_TAG: ${{ needs['build-artifacts'].outputs.npm_tag }}
         run: node scripts/publish-ci.ts ./package-tarballs "${NPM_TAG}"
+
+  tag:
+    name: Create release tag
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          persist-credentials: false
+
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app
+        with:
+          client-id: ${{ vars.RELEASE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.RELEASE_GITHUB_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Push release tag
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          RELEASE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          VERSION="$(jq -r .version package.json)"
+          git tag "v$VERSION" "$RELEASE_SHA"
+          git push "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" "v$VERSION"
